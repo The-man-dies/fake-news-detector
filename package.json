@@ -1,0 +1,21 @@
+{
+  "name": "fake_news",
+ 
+  "type": "module",
+  "private": true,
+  "workspaces":[
+    "app/*",
+    "packages/*"
+  ],
+   "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "build": "bun run --filter '*' build",
+    "clean": "rm -rf node_modules .turbo"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
