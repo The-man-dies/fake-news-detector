@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- ÉNUMÉRATIONS (Types personnalisés) ---
+
+enum Role {
+  ADMIN // Directeur de Publication
+  JOURNALIST // Reviewer / Journaliste
+  CITIZEN // Citoyen / Vigie
+}
+
+enum ReportStatus {
+  OPEN // Nouveau signalement dans l'Inbox
+  IN_PROGRESS // Pris en charge par un journaliste
+  PENDING_REVIEW // Soumis à l'admin (Draft fini)
+  NEEDS_REVISION // Rejeté par l'admin, retour au journaliste
+  PUBLISHED // Validé et diffusé par Mass Broadcast
+}
+
+enum MediaType {
+  AUDIO
+  LINK
+  TEXT
+  VIDEO
+}
+
+enum Verdict {
+  TRUE
+  FALSE
+  MISLEADING
+  UNVERIFIABLE
+}
+
+// --- TABLES D'AUTHENTIFICATION (BetterAuth) ---
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  name            String?
+  emailVerified   Boolean  @default(false)
+  image           String?
+  role            Role     @default(CITIZEN)
+  engagementScore Int      @default(0) // Score de fiabilité/engagement
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations BetterAuth
+  sessions Session[]
+  accounts Account[]
+
+  // Relations Métier
+  reports           Report[]           @relation("CitizenReports")
+  analyses          Analysis[]         @relation("JournalistAnalyses")
+  approvals         Publication[]      @relation("AdminApprovals")
+  pushSubscriptions PushSubscription[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@map("verification")
+}
+
+// --- TABLES MÉTIER (Fact-Checking) ---
+
+model Report {
+  id        String       @id @default(uuid())
+  content   String       @db.Text
+  mediaType MediaType
+  mediaUrl  String? // URL vers Cloudflare R2
+  status    ReportStatus @default(OPEN)
+  createdAt DateTime     @default(now())
+
+  // Le citoyen qui a fait le signalement
+  citizenId String
+  citizen   User   @relation("CitizenReports", fields: [citizenId], references: [id])
+
+  // L'analyse associée (1 report a 0 ou 1 analyse)
+  analysis Analysis?
+
+  @@map("report")
+}
+
+model Analysis {
+  id       String @id @default(uuid())
+  reportId String @unique
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  journalistId String
+  journalist   User   @relation("JournalistAnalyses", fields: [journalistId], references: [id])
+
+  draftVerdict    Verdict @default(UNVERIFIABLE)
+  journalistNotes String  @db.Text
+
+  // Commentaire obligatoire en cas de rejet par l'Admin
+  feedbackComment String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // La publication finale (1 analyse donne 0 ou 1 publication)
+  publication Publication?
+
+  @@map("analysis")
+}
+
+model Publication {
+  id         String   @id @default(uuid())
+  analysisId String   @unique
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  // L'admin qui a donné le "Bon à tirer"
+  approvedById String
+  approver     User   @relation("AdminApprovals", fields: [approvedById], references: [id])
+
+  finalVerdict String   @db.Text // Le texte qui sera dans le Push et la fiche
+  publishedAt  DateTime @default(now())
+  isAnonymized Boolean  @default(true) // Toujours vrai pour protéger le citoyen
+
+  @@map("publication")
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fcmToken  String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("push_subscription")
+}
