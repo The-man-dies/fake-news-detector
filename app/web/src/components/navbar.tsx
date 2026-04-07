@@ -34,7 +34,7 @@ export default function Navbar({ className }: { className?: string }) {
 }
 function NavIcom({ children }: { children: React.ReactNode }) {
     return (
-        <div className="flex flex-col  justify-center  [&>span]:mx-auto [&>span]:mt-1 lg:flex-row lg:[&>*]:mt-auto lg:gap-2 bgy">
+        <div className="flex flex-col  justify-center  [&>span]:mx-auto [&>span]:mt-1 lg:flex-row lg:justify-start lg:[&>*]:mt-auto  lg:[&>span]:ml-0 lg:gap-2 bgy">
             {children}
         </div>
     );

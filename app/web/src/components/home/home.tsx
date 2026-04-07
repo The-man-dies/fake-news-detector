@@ -3,7 +3,7 @@ import InfoCard from "./infoCard";
 
 export default function Home() {
     return (
-        <div className=" ">
+        <div className=" lg:w-[700px] ">
             {/* header */}
 
             <div className="flex flex-row justify-between ">
@@ -17,7 +17,7 @@ export default function Home() {
                 <p>communaute</p>
             </div>
 
-            <div className="h-full w-[402] overflow-y-auto ">
+            <div className="h-screen overflow-y-scroll w-full no-scroll-bar">
                 <InfoCard />
                 <InfoCard />
                 <InfoCard />

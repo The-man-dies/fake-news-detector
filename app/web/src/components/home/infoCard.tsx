@@ -1,7 +1,7 @@
 export default function InfoCard() {
     return (
         <div className="h-[417px] w-full flex flex-col">
-            <div className="bg-secondary rounded-[20px] w-full h-[194px]">
+            <div className="bg-secondary rounded-[20px] w-full h-[194px] lg:h-[350px]">
                 <img src="" alt="" />{" "}
             </div>
             <div className="flex flex-row justify-between">
