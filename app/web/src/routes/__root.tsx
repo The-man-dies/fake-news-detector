@@ -7,7 +7,7 @@ export const Route = createRootRoute({
     component: () => (
         <div className="min-h-screen w-full bg-background">
             <div className="mx-auto min-w-[340px] w-[402px]  lg:flex lg:flex-row lg:w-[1000px]  bg-background pb-[60px] shadow-lg">
-                <Navbar className=" fixed bottom-0 left-0 w-full h-[52px] flex justify-between items-center lg:relative lg:h-screen lg:flex lg:flex-col lg:justify-start lg:gap-3   lg:w-1/3" />
+                <Navbar className=" fixed bottom-0 left-0 w-full h-[52px] flex justify-between items-center lg:relative lg:h-screen lg:flex lg:flex-col lg:justify-start lg:gap-3   lg:w-1/3 " />
                 <main className="flex-1">
                     <Outlet />
                 </main>

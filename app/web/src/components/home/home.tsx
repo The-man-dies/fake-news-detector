@@ -8,7 +8,7 @@ export default function Home() {
 
             <div className="flex flex-row justify-between ">
                 <h1 className="font-bold text-[20px]">Fake news detector</h1>
-                <HiChatBubbleLeft size={25} className="fill-gray-600" />
+                <HiChatBubbleLeft size={25} className="fill-gray-600 lg:hidden" />
             </div>
             {/* navbar */}
             <div className="flex flex-row justify-between [&>p]:text-[16px] [&>p]:font-bold ">
