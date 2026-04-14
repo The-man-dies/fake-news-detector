@@ -9,11 +9,11 @@ export default function InfoCard() {
                 <p className="text-[14px] text-card-foreground/30">il y a 2h</p>
             </div>
             <div className="flex flex-row justify-between relative">
-                <div className="h-[4px] w-[239px] bg-card-foreground">
+                <div className="h-[4px] w-[80%] bg-card-foreground flex justify-between">
                     <div className="h-full w-[90%] bg-primary"></div>
                 </div>
-                <h1 className="text-primary text-[10px] absolute left-[245px] -top-1">90%</h1>
-                <h1 className="font-bold text-[13px] absolute left-[325px] -top-2">fiable</h1>
+                <h1 className="text-primary text-[10px] relative -top-1">90%</h1>
+                <h1 className="font-bold text-[13px]  relative -top-2">fiable</h1>
             </div>
             <h1 className="text-[16px]  text-card-foreground/80 my-3">
                 Independent monitors across Ségou report consistent pricing for staple crops, refuting early rumors of

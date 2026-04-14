@@ -10,8 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as BankaiRouteImport } from './routes/bankai'
-import { Route as AboutRouteImport } from './routes/about'
+import { Route as ExplorerRouteImport } from './routes/explorer'
+import { Route as ChatRouteImport } from './routes/chat'
+import { Route as AlertRouteImport } from './routes/alert'
 import { Route as IndexRouteImport } from './routes/index'
 
 const ProfileRoute = ProfileRouteImport.update({
@@ -19,14 +20,19 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BankaiRoute = BankaiRouteImport.update({
-  id: '/bankai',
-  path: '/bankai',
+const ExplorerRoute = ExplorerRouteImport.update({
+  id: '/explorer',
+  path: '/explorer',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlertRoute = AlertRouteImport.update({
+  id: '/alert',
+  path: '/alert',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,35 +43,39 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/bankai': typeof BankaiRoute
+  '/alert': typeof AlertRoute
+  '/chat': typeof ChatRoute
+  '/explorer': typeof ExplorerRoute
   '/profile': typeof ProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/bankai': typeof BankaiRoute
+  '/alert': typeof AlertRoute
+  '/chat': typeof ChatRoute
+  '/explorer': typeof ExplorerRoute
   '/profile': typeof ProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/bankai': typeof BankaiRoute
+  '/alert': typeof AlertRoute
+  '/chat': typeof ChatRoute
+  '/explorer': typeof ExplorerRoute
   '/profile': typeof ProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/bankai' | '/profile'
+  fullPaths: '/' | '/alert' | '/chat' | '/explorer' | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/bankai' | '/profile'
-  id: '__root__' | '/' | '/about' | '/bankai' | '/profile'
+  to: '/' | '/alert' | '/chat' | '/explorer' | '/profile'
+  id: '__root__' | '/' | '/alert' | '/chat' | '/explorer' | '/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  BankaiRoute: typeof BankaiRoute
+  AlertRoute: typeof AlertRoute
+  ChatRoute: typeof ChatRoute
+  ExplorerRoute: typeof ExplorerRoute
   ProfileRoute: typeof ProfileRoute
 }
 
@@ -78,18 +88,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/bankai': {
-      id: '/bankai'
-      path: '/bankai'
-      fullPath: '/bankai'
-      preLoaderRoute: typeof BankaiRouteImport
+    '/explorer': {
+      id: '/explorer'
+      path: '/explorer'
+      fullPath: '/explorer'
+      preLoaderRoute: typeof ExplorerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alert': {
+      id: '/alert'
+      path: '/alert'
+      fullPath: '/alert'
+      preLoaderRoute: typeof AlertRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -104,8 +121,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  BankaiRoute: BankaiRoute,
+  AlertRoute: AlertRoute,
+  ChatRoute: ChatRoute,
+  ExplorerRoute: ExplorerRoute,
   ProfileRoute: ProfileRoute,
 }
 export const routeTree = rootRouteImport
