@@ -7,8 +7,9 @@ export const Route = createFileRoute("/explorer")({
 
 function RouteComponent() {
     return (
-        <div>
+        <div className="overflow-hidden space-y-4 md:px-4">
             <Explorer />
+            <main className="overflow-y-scroll h-screen no-scroll-bar"></main>
         </div>
     );
 }

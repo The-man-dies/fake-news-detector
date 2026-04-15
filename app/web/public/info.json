@@ -8,8 +8,8 @@
       "status": "fiable",
       "description": "Les marchés agricoles de Ségou montrent une stabilité des prix.",
       "region": "Ségou",
-      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950",
-      "authorAvatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde"
+      "image": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&h=500&fit=crop&auto=format&q=75",
+      "authorAvatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=64&h=64&fit=crop&auto=format&q=70"
     },
     {
       "id": 2,
@@ -19,8 +19,8 @@
       "status": "à surveiller",
       "description": "Impact du carburant sur le transport urbain.",
       "region": "Bamako",
-      "image": "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e",
-      "authorAvatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
+      "image": "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&h=500&fit=crop&auto=format&q=75",
+      "authorAvatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=64&h=64&fit=crop&auto=format&q=70"
     },
     {
       "id": 3,
@@ -30,8 +30,8 @@
       "status": "fiable",
       "description": "Production agricole en hausse dans le sud du Mali.",
       "region": "Sikasso",
-      "image": "https://images.unsplash.com/photo-1602526211729-8c2b0c5d6c3b",
-      "authorAvatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12"
+      "image": "https://images.unsplash.com/photo-1602526211729-8c2b0c5d6c3b?w=800&h=500&fit=crop&auto=format&q=75",
+      "authorAvatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=64&h=64&fit=crop&auto=format&q=70"
     },
     {
       "id": 4,
@@ -41,8 +41,8 @@
       "status": "urgent",
       "description": "Montée du niveau du fleuve Niger surveillée.",
       "region": "Mopti",
-      "image": "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
-      "authorAvatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"
+      "image": "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?w=800&h=500&fit=crop&auto=format&q=75",
+      "authorAvatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&auto=format&q=70"
     },
     {
       "id": 5,
@@ -52,8 +52,8 @@
       "status": "fiable",
       "description": "Réhabilitation des routes principales en cours.",
       "region": "Koulikoro",
-      "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e",
-      "authorAvatar": "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c"
+      "image": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&h=500&fit=crop&auto=format&q=75",
+      "authorAvatar": "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=64&h=64&fit=crop&auto=format&q=70"
     },
     {
       "id": 6,
@@ -63,8 +63,8 @@
       "status": "à surveiller",
       "description": "Baisse de pression dans plusieurs quartiers.",
       "region": "Bamako",
-      "image": "https://images.unsplash.com/photo-1587502537104-9a0e1b4b1f6c",
-      "authorAvatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d"
+      "image": "https://images.unsplash.com/photo-1587502537104-9a0e1b4b1f6c?w=800&h=500&fit=crop&auto=format&q=75",
+      "authorAvatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&h=64&fit=crop&auto=format&q=70"
     },
     {
       "id": 7,
@@ -74,8 +74,8 @@
       "status": "fiable",
       "description": "Baisse progressive des prix agricoles.",
       "region": "Kayes",
-      "image": "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2",
-      "authorAvatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12"
+      "image": "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?w=800&h=500&fit=crop&auto=format&q=75",
+      "authorAvatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=64&h=64&fit=crop&auto=format&q=70"
     },
     {
       "id": 8,
@@ -85,8 +85,8 @@
       "status": "fiable",
       "description": "Reprise du commerce transfrontalier.",
       "region": "Gao",
-      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-      "authorAvatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
+      "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&h=500&fit=crop&auto=format&q=75",
+      "authorAvatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=64&h=64&fit=crop&auto=format&q=70"
     },
     {
       "id": 9,
@@ -96,8 +96,8 @@
       "status": "à surveiller",
       "description": "Difficultés d’approvisionnement sur les marchés.",
       "region": "Tombouctou",
-      "image": "https://images.unsplash.com/photo-1600628421069-4f0a3f5c9c1e",
-      "authorAvatar": "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c"
+      "image": "https://images.unsplash.com/photo-1600628421069-4f0a3f5c9c1e?w=800&h=500&fit=crop&auto=format&q=75",
+      "authorAvatar": "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=64&h=64&fit=crop&auto=format&q=70"
     },
     {
       "id": 10,
@@ -107,8 +107,8 @@
       "status": "fiable",
       "description": "Lancement de la campagne agricole nationale.",
       "region": "Koutiala",
-      "image": "https://images.unsplash.com/photo-1500595046743-cd271d694d30",
-      "authorAvatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12"
+      "image": "https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=800&h=500&fit=crop&auto=format&q=75",
+      "authorAvatar": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=64&h=64&fit=crop&auto=format&q=70"
     }
   ]
 }
