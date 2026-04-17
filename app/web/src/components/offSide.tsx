@@ -15,7 +15,7 @@ export default function OffSide({ className }: { className?: string }) {
                 />
             </div>
 
-            <div className="bg-card text-card-foreground border border-border rounded-(--radius) p-6 shadow-sm">
+            <div className="bg-card/50 text-card-foreground border border-border rounded-(--radius) p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-lg font-black tracking-tight">Activité 24h</h2>
                     <TrendingUp size={18} className="text-primary" />
@@ -27,7 +27,7 @@ export default function OffSide({ className }: { className?: string }) {
                 </div>
             </div>
 
-            <div className="bg-card text-card-foreground border border-border rounded-(--radius) overflow-hidden shadow-sm">
+            <div className="bg-card/50 text-card-foreground border border-border rounded-(--radius) overflow-hidden shadow-sm">
                 <div className="p-6 bg-muted/20 border-b border-border">
                     <h2 className="text-lg font-black tracking-tight flex items-center gap-2">
                         <Bookmark size={18} className="text-primary fill-primary/10" />
