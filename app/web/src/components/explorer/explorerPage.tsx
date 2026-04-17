@@ -8,9 +8,8 @@ export default function Explorer() {
                 <h1 className="">Fakes news detector </h1>
                 <SearchInput />
             </header>
-            <main className="overflow-y-scroll h-screen no-scroll-bar">
-                <RecentPage />
-            </main>
+            <RecentPage />
+            <main className="overflow-y-scroll h-screen no-scroll-bar w-full"></main>
         </div>
     );
 }

@@ -4,9 +4,9 @@ export interface UserInterface {
     pp: string;
 }
 
-export default function IsconeRecentUser({ id, nom, pp }: UserInterface) {
+export default function IsconeRecentUser({ nom, pp }: UserInterface) {
     return (
-        <div className="h-[59px] w-[59px] rounded-full overflow-hidden">
+        <div className=" w-[65px] rounded-full overflow-hidden border-4 border-border">
             <img src={`${pp}`} alt={`${nom}`} />
         </div>
     );

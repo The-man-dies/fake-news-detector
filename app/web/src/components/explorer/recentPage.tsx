@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import IsconeRecentUser from "./iconeRecentUser";
 import type { UserInterface } from "./iconeRecentUser";
+import IsconeRecentUser from "./iconeRecentUser";
 interface UserType extends UserInterface {
     users: UserInterface[];
 }
@@ -13,12 +13,12 @@ export default function RecentPage() {
     const { data } = useQuery<UserType>({ queryKey: ["users"], queryFn: getUser });
     console.log(data);
     return (
-        <div className="">
-            <span className="text-primary mb-2">@ recent</span>
-            <div className="w-full overflow-x-scroll no-scroll-bar flex flex-row gap-2.5">
-                {/* {data?.users.map(items => (
+        <div className="w-full">
+            <span className="text-primary ">@ recent</span>
+            <div className="overflow-x-scroll mt-4 flex w-full h-auto space-x-2">
+                {data?.users.map(items => (
                     <IsconeRecentUser key={items.id} pp={items.pp} nom={items.nom} />
-                ))} */}
+                ))}
             </div>
         </div>
     );
