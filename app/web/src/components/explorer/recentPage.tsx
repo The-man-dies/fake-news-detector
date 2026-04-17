@@ -1,23 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
 import type { UserInterface } from "./iconeRecentUser";
 import IsconeRecentUser from "./iconeRecentUser";
-interface UserType extends UserInterface {
+
+interface UserType {
     users: UserInterface[];
 }
+
 const getUser = async () => {
-    const query = fetch("/userPP.json");
-    const data = await (await query).json();
-    return data;
+    const response = await fetch("/userPP.json");
+    if (!response.ok) throw new Error("Failed to load users");
+    return response.json();
 };
+
 export default function RecentPage() {
-    const { data } = useQuery<UserType>({ queryKey: ["users"], queryFn: getUser });
-    console.log(data);
+    const { data, isLoading } = useQuery<UserType>({ 
+        queryKey: ["users"], 
+        queryFn: getUser 
+    });
+
+    if (isLoading) return <div className="h-20 flex items-center justify-center text-muted-foreground animate-pulse">Chargement...</div>;
+
     return (
         <div className="w-full">
-            <span className="text-primary ">@ recent</span>
-            <div className="overflow-x-scroll mt-4 flex w-full h-auto space-x-2">
-                {data?.users.map(items => (
-                    <IsconeRecentUser key={items.id} pp={items.pp} nom={items.nom} />
+            <div className="overflow-x-auto flex w-full space-x-6 no-scroll-bar pb-2">
+                {data?.users.map(user => (
+                    <IsconeRecentUser key={user.id} pp={user.pp} nom={user.nom} />
                 ))}
             </div>
         </div>
