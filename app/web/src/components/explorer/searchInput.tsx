@@ -1,14 +1,17 @@
-import { BiSearch } from "react-icons/bi";
+import { Search } from "lucide-react";
 
 export default function SearchInput() {
     return (
-        <label className="border border-border flex flex-row gap-2.5 rounded-md px-3 bg-muted">
-            <BiSearch className="mt-1 fill-gray-600" size={20} />
+        <div className="relative group">
+            <Search
+                className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors"
+                size={18}
+            />
             <input
                 type="text"
-                placeholder="hrl"
-                className="focus:border-none focus:outline-none w-full text-muted-foreground"
+                placeholder="Vérifier une source..."
+                className="w-full pl-12 pr-5 py-4 bg-background border border-border rounded-(--radius) focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all text-sm font-bold placeholder:text-muted-foreground/50 shadow-sm"
             />
-        </label>
+        </div>
     );
 }
