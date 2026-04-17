@@ -35,7 +35,7 @@ export default function Home() {
 
     return (
         <div className="flex flex-col h-full">
-            <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-md border-b border-border/60 px-5 py-6">
+            <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-md border-b border-r border-border/60 px-5 py-6">
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-2xl font-black tracking-tighter">Flux d'Analyses</h1>
                     <button className="p-2.5 rounded-xl bg-muted hover:bg-muted/80 transition-colors lg:hidden">
