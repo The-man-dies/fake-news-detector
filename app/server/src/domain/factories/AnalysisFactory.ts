@@ -28,7 +28,7 @@ export class AnalysisFactory {
     return this.create({
       reportId,
       journalistId,
-      mediaCategory: 'UNCLASSIFIED',
+      mediaCategory: 'AUDIO',
       draftVerdict: 'UNVERIFIABLE',
       investigationNotes: '',
     })
