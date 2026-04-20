@@ -40,6 +40,12 @@ enum ReportStatus {
   UNVERIFIABLE // Impossible à vérifier, archivé
 }
 
+enum WatcherApplicationStatus {
+  PENDING // Candidature en attente de décision
+  APPROVED // Candidature approuvée, devient vigie
+  REJECTED // Candidature rejetée
+}
+
 // Verdict d'une analyse
 enum Verdict {
   TRUE // Information confirmée vraie
@@ -180,12 +186,12 @@ model Publication {
 
 // Candidature d'un citoyen pour devenir watcher
 model WatcherApplication {
-  id         String   @id @default(uuid())
-  user_id    String   @unique
-  user       User     @relation(fields: [user_id], references: [id])
-  motivation String   @db.Text // Motivation du candidat
-  status     String   @default("PENDING") // PENDING, APPROVED, REJECTED,
-  created_at DateTime @default(now())
+  id         String                   @id @default(uuid())
+  user_id    String                   @unique
+  user       User                     @relation(fields: [user_id], references: [id])
+  motivation String                   @db.Text // Motivation du candidat
+  status     WatcherApplicationStatus @default(PENDING) // PENDING, APPROVED, REJECTED,
+  created_at DateTime                 @default(now())
 
   @@map("watcher_applications")
 }
