@@ -15,6 +15,9 @@ export class Analysis {
     return true
   }
   applyFeedback(reason: string): void {
+    if (this.attemptCount >= 1000) {
+      throw new Error('Maximum rejection attempts reached')
+    }
     this.currentRejectionReason = reason
     this.attemptCount++
   }
