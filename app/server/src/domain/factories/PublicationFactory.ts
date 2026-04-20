@@ -1,5 +1,6 @@
 // domain/factories/PublicationFactory.ts
 import { Publication } from '../entities/Publication'
+import { Analysis } from '../entities/Analysis'
 import { randomUUID } from 'crypto'
 
 export interface CreatePublicationParams {

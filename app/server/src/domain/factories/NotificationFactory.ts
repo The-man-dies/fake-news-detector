@@ -41,7 +41,13 @@ export class NotificationFactory {
     )
   }
 
-  static createBatch(citizenIds: string[], message: string): Notification[] {
-    return citizenIds.map((citizenId) => this.create(citizenId, message))
+  static createBatch(
+    citizenIds: string[],
+    message: string,
+    publicationId?: string,
+  ): Notification[] {
+    return citizenIds.map((citizenId) =>
+      this.create(citizenId, message, publicationId),
+    )
   }
 }
