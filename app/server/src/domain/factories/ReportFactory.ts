@@ -12,6 +12,7 @@ export class ReportFactory {
   static create(params: CreateReportParams): Report {
     return new Report(
       randomUUID(),
+      params.citizenId,
       'OPEN' as ReportStatus,
       params.content,
       params.mediaUrl,

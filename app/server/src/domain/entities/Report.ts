@@ -8,6 +8,7 @@ export type ReportStatus =
 export class Report {
   constructor(
     public readonly id: string,
+    public citizenId: string,
     public status: ReportStatus,
     public content: string,
     public mediaUrl?: string,

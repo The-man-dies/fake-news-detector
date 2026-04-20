@@ -1,4 +1,7 @@
 // domain/entities/Admin.ts
+import { Analysis } from './Analysis'
+import { InboxSubject } from '../value-objects/InboxSubject'
+
 export class Admin {
   constructor(
     public readonly id: string,

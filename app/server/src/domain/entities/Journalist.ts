@@ -1,4 +1,7 @@
 // domain/entities/Journalist.ts
+import { Report } from './Report'
+import { AuthoritySource } from '../value-objects/AuthoritySource'
+
 export type JournalistStatus = 'BANNED' | 'DISABLED' | 'ACTIVE'
 
 export class Journalist {
