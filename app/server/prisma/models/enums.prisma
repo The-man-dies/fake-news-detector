@@ -14,6 +14,15 @@ enum AccountStatus {
   BANNED
 }
 
+enum StatusReason {
+  SPAM
+  ABUSE
+  FRAUD
+  INACTIVITY
+  USER_REQUEST
+  OTHER
+}
+
 enum CitizenType {
   REGULAR
   WATCHER
