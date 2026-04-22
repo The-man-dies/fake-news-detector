@@ -3,24 +3,24 @@ import { Report, ReportStatus } from '../entities/Report'
 import { randomUUID } from 'crypto'
 
 export interface CreateReportParams {
-  content: string
-  title: string
-  theme: string
-  mediaUrl?: string
   citizenId: string
+  theme: string
+  title: string
+  content: string
 }
 
 export class ReportFactory {
   static create(params: CreateReportParams): Report {
+    const id = randomUUID()
     return new Report(
-      randomUUID(),
+      id,
       params.citizenId,
-      params.title,
       params.theme,
-
-      'OPEN' as ReportStatus,
+      params.title,
       params.content,
-      params.mediaUrl,
+      'OPEN' as ReportStatus,
+      new Date(),
+      new Date(),
     )
   }
 
@@ -32,19 +32,9 @@ export class ReportFactory {
   ): Report {
     return this.create({
       citizenId,
-      title,
       theme,
+      title,
       content,
     })
-  }
-
-  static createWithMedia(
-    content: string,
-    mediaUrl: string,
-    citizenId: string,
-    title: string,
-    theme: string,
-  ): Report {
-    return this.create({ citizenId, title, theme, content, mediaUrl })
-  }
+  } 
 }
