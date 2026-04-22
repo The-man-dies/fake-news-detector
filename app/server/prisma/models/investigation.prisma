@@ -1,0 +1,87 @@
+//
+// INVESTIGATION
+//
+
+model Investigation {
+  id String @id @default(uuid())
+
+  reportId String @unique
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  journalistId String
+  journalist   Actor  @relation("JournalistInvestigations", fields: [journalistId], references: [id])
+
+  mediaCategory      MediaCategory?
+  draftVerdict       Verdict        @default(UNVERIFIABLE)
+  investigationNotes String         @db.Text
+
+  attemptCount Int @default(0)
+
+  publication Publication?
+
+  evidence Evidence[]
+
+  media InvestigationMedia[]
+  workflowAudits WorkflowAudit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("investigations")
+}
+
+//
+// INVESTIGATION MEDIA
+//
+
+model InvestigationMedia {
+  id    Int       @id @default(autoincrement())
+  url   String
+  type  MediaType
+  order Int
+
+  origin      MediaOrigin
+  category    MediaCategory?
+  reliability Verdict?
+  justification String? @db.Text
+
+  investigationId String
+  investigation   Investigation @relation(fields: [investigationId], references: [id], onDelete: Cascade)
+
+  authoritySourceId String?
+  authoritySource   AuthoritySource? @relation(fields: [authoritySourceId], references: [id])
+
+  uploadedById String
+  uploadedBy   Actor  @relation(fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([investigationId])
+  @@index([authoritySourceId])
+}
+
+//
+// WORKFLOW AUDIT
+//
+
+model WorkflowAudit {
+  id String @id @default(uuid())
+
+  investigationId String
+  investigation   Investigation @relation(fields: [investigationId], references: [id], onDelete: Cascade)
+
+  actorId String
+  actor   Actor  @relation("WorkflowAuditAuthor", fields: [actorId], references: [id])
+
+  previousStatus ReportStatus?
+  newStatus      ReportStatus
+
+  comment String? @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@index([investigationId])
+  @@index([actorId])
+  @@map("workflow_audits")
+}

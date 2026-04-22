@@ -4,6 +4,8 @@ import { randomUUID } from 'crypto'
 
 export interface CreateReportParams {
   content: string
+  title: string
+  theme: string
   mediaUrl?: string
   citizenId: string
 }
@@ -13,21 +15,36 @@ export class ReportFactory {
     return new Report(
       randomUUID(),
       params.citizenId,
+      params.title,
+      params.theme,
+
       'OPEN' as ReportStatus,
       params.content,
       params.mediaUrl,
     )
   }
 
-  static createFromScratch(content: string, citizenId: string): Report {
-    return this.create({ content, citizenId })
+  static createFromScratch(
+    content: string,
+    citizenId: string,
+    title: string,
+    theme: string,
+  ): Report {
+    return this.create({
+      citizenId,
+      title,
+      theme,
+      content,
+    })
   }
 
   static createWithMedia(
     content: string,
     mediaUrl: string,
     citizenId: string,
+    title: string,
+    theme: string,
   ): Report {
-    return this.create({ content, mediaUrl, citizenId })
+    return this.create({ citizenId, title, theme, content, mediaUrl })
   }
 }

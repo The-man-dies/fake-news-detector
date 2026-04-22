@@ -1,0 +1,44 @@
+//
+// INBOX SUBJECT
+//
+
+model InboxSubject {
+  id          String @id @default(uuid())
+  theme       String
+  description String @db.Text
+
+  origin InboxSubjectOrigin @default(REPORT)
+  status InboxSubjectStatus @default(OPEN)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdById String
+  createdBy   Actor  @relation("InboxSubjectCreator", fields: [createdById], references: [id])
+
+  media InboxSubjectMedia[]
+
+  @@map("inbox_subjects")
+}
+
+//
+// INBOX SUBJECT MEDIA
+//
+
+model InboxSubjectMedia {
+  id    Int       @id @default(autoincrement())
+  url   String
+  type  MediaType
+  order Int
+
+  inboxSubjectId String
+  inboxSubject   InboxSubject @relation(fields: [inboxSubjectId], references: [id], onDelete: Cascade)
+
+  uploadedById String
+  uploadedBy   Actor  @relation(fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([inboxSubjectId])
+}
