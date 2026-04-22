@@ -1,0 +1,79 @@
+//
+// PUBLICATION
+//
+
+model Publication {
+  id String @id @default(uuid())
+
+  investigationId String        @unique
+  investigation   Investigation @relation(fields: [investigationId], references: [id], onDelete: Cascade)
+
+  approvedById String
+  approvedBy   Actor  @relation("DirectorApprovals", fields: [approvedById], references: [id])
+
+  finalVerdict Verdict
+
+  publishedAt  DateTime @default(now())
+  isCorrection Boolean  @default(false)
+
+  notifications Notification[]
+
+  verifiedMedia VerifiedMedia[]
+  verifiedLinks VerifiedLink[]
+
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  correction Correction[]
+
+  @@map("publications")
+}
+
+//
+// VERIFIED MEDIA
+//
+
+model VerifiedMedia {
+  id Int @id @default(autoincrement())
+
+  url   String
+  type  MediaType
+  order Int
+
+  authoritySourceId String?
+  authoritySource   AuthoritySource? @relation(fields: [authoritySourceId], references: [id])
+
+  publicationId String
+  publication   Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+
+  addedById String
+  addedBy   Actor  @relation(fields: [addedById], references: [id])
+
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+
+  @@index([authoritySourceId])
+}
+
+//
+// VERIFIED LINKS
+//
+
+model VerifiedLink {
+  id Int @id @default(autoincrement())
+
+  url String
+
+  authoritySourceId String
+  authoritySource AuthoritySource @relation(fields: [authoritySourceId], references: [id])
+
+  publicationId String
+  publication   Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
+
+  addedById String
+  addedBy   Actor  @relation(fields: [addedById], references: [id])
+
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+}

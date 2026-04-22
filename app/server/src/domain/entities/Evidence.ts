@@ -1,0 +1,19 @@
+// domain/entities/Evidence.ts
+
+export class Evidence {
+  constructor(
+    public readonly id: string,
+    public content: string,
+    public title: string,
+    public investigationId: string,
+    public watcherId: string,
+    public readonly createdAt: Date = new Date(),
+    public updatedAt: Date = new Date(),
+  ) {}
+
+  updateContent(title: string, content: string): void {
+    this.title = title
+    this.content = content
+    this.updatedAt = new Date()
+  }
+}

@@ -1,0 +1,100 @@
+//
+// ENUMS
+//
+
+enum Role {
+  EDITORIAL_DIRECTOR
+  JOURNALIST
+  CITIZEN
+}
+
+enum AccountStatus {
+  ACTIVE
+  DISABLED
+  BANNED
+}
+
+enum StatusReason {
+  SPAM
+  ABUSE
+  FRAUD
+  INACTIVITY
+  USER_REQUEST
+  OTHER
+}
+
+enum CitizenType {
+  REGULAR
+  WATCHER
+}
+
+enum ReportStatus {
+  OPEN
+  IN_PROGRESS
+  PENDING_REVIEW
+  NEEDS_REVISION
+  PUBLISHED
+  UNVERIFIABLE
+}
+
+enum WatcherApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Verdict {
+  TRUE
+  FALSE
+  MISLEADING
+  UNVERIFIABLE
+}
+
+enum MediaType {
+  AUDIO
+  LINK
+  TEXT
+  IMAGE
+  VIDEO
+  DOCUMENT
+}
+
+enum MediaCategory {
+  CONTEXT_COLLAPSE
+  MANIPULATED
+  FABRICATED
+  SATIRE
+  MISLEADING
+  IMPOSTOR
+  OTHER
+}
+
+enum InboxSubjectOrigin {
+  REPORT
+  DIRECTOR_INITIATED
+}
+
+enum InboxSubjectStatus {
+  OPEN
+  IN_PROGRESS
+  ARCHIVED
+}
+
+enum SourceType {
+  OFFICIAL_DECREE
+  ORIGINAL_RETRACTION
+  DIRECT_EVIDENCE
+  MEDIA_CROSSCHECK
+  AUTHORITY_STATEMENT
+}
+
+enum MediaOrigin {
+  CITIZEN_REPORT
+  JOURNALIST_PROOF
+}
+
+enum NotificationType {
+  PUBLICATION
+  CORRECTION
+  ALERT
+}

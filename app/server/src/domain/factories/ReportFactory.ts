@@ -3,31 +3,38 @@ import { Report, ReportStatus } from '../entities/Report'
 import { randomUUID } from 'crypto'
 
 export interface CreateReportParams {
-  content: string
-  mediaUrl?: string
   citizenId: string
+  theme: string
+  title: string
+  content: string
 }
 
 export class ReportFactory {
   static create(params: CreateReportParams): Report {
+    const id = randomUUID()
     return new Report(
-      randomUUID(),
+      id,
       params.citizenId,
-      'OPEN' as ReportStatus,
+      params.theme,
+      params.title,
       params.content,
-      params.mediaUrl,
+      'OPEN' as ReportStatus,
+      new Date(),
+      new Date(),
     )
   }
 
-  static createFromScratch(content: string, citizenId: string): Report {
-    return this.create({ content, citizenId })
-  }
-
-  static createWithMedia(
+  static createFromScratch(
     content: string,
-    mediaUrl: string,
     citizenId: string,
+    title: string,
+    theme: string,
   ): Report {
-    return this.create({ content, mediaUrl, citizenId })
-  }
+    return this.create({
+      citizenId,
+      theme,
+      title,
+      content,
+    })
+  } 
 }

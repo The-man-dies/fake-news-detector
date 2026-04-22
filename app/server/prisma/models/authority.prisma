@@ -1,0 +1,15 @@
+//
+// AUTHORITY SOURCE
+//
+
+model AuthoritySource {
+  id   String @id @default(uuid())
+  name String
+  type SourceType
+
+  createdAt DateTime @default(now())
+
+  investigationMedia InvestigationMedia[]
+  verifiedMedia      VerifiedMedia[]
+  verifiedLinkMedia  VerifiedLink[]
+}

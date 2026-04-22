@@ -1,0 +1,52 @@
+//
+// NOTIFICATION
+//
+
+model Notification {
+  id   String           @id @default(uuid())
+  type NotificationType
+
+  theme   String
+  message String @db.Text
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  actorId String
+  actor   Actor  @relation("ActorNotifications", fields: [actorId], references: [id])
+
+  publicationId String?
+  publication   Publication? @relation(fields: [publicationId], references: [id])
+
+  verifiedMedia VerifiedMedia[]
+  verifiedLinks VerifiedLink[]
+
+  correction Correction?
+
+  @@map("notifications")
+}
+
+//
+// RECTIFICATION
+//
+
+model Correction {
+  id String @id @default(uuid())
+
+  notificationId String       @unique
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  publicationId String
+  publication   Publication @relation(fields: [publicationId], references: [id])
+
+  title   String
+  content String @db.Text
+
+  correctedById String
+  correctedBy   Actor  @relation("DirectorCorrections", fields: [correctedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

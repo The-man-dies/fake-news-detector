@@ -1,0 +1,47 @@
+//
+// EVIDENCE
+//
+
+model Evidence {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  investigationId String
+  investigation   Investigation @relation(fields: [investigationId], references: [id], onDelete: Cascade)
+
+  watcherId String
+  watcher   Actor  @relation("WatcherEvidenceAuthor", fields: [watcherId], references: [id])
+
+  media EvidenceMedia[]
+
+  @@map("evidence")
+}
+
+//
+// EVIDENCE MEDIA
+//
+
+model EvidenceMedia {
+  id    Int       @id @default(autoincrement())
+  url   String
+  type  MediaType
+  order Int
+
+  category    MediaCategory?
+  reliability Verdict?
+  justification String? @db.Text
+
+  evidenceId String
+  evidence   Evidence @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+
+  uploadedById String
+  uploadedBy   Actor  @relation(fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([evidenceId])
+}
