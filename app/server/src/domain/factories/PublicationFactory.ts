@@ -1,48 +1,40 @@
 // domain/factories/PublicationFactory.ts
 import { Publication } from '../entities/Publication'
-import { Analysis } from '../entities/Analysis'
 import { randomUUID } from 'crypto'
+import { type Verdict } from '../value-objects'
 
 export interface CreatePublicationParams {
-  analysisId: string
+  investigationId: string
   approvedById: string
-  finalVerdict: string
+  finalVerdict: Verdict
+  publishedAt?: Date
   isCorrection?: boolean
 }
 
 export class PublicationFactory {
   static create(params: CreatePublicationParams): Publication {
+    const id = randomUUID()
     return new Publication(
-      randomUUID(),
-      params.analysisId,
+      id,
+      params.investigationId,
       params.approvedById,
       params.finalVerdict,
       new Date(),
       params.isCorrection || false,
+      new Date(),
+      new Date(),
     )
   }
 
-  static createCorrection(
-    analysisId: string,
+  static createPublication(
+    investigationId: string,
     approvedById: string,
-    originalVerdict: string,
+    finalVerdict: Verdict,
   ): Publication {
     return this.create({
-      analysisId,
+      investigationId,
       approvedById,
-      finalVerdict: `CORRECTION: ${originalVerdict}`,
-      isCorrection: true,
-    })
-  }
-
-  static createFromAnalysis(
-    analysis: Analysis,
-    approvedById: string,
-  ): Publication {
-    return this.create({
-      analysisId: analysis.id,
-      approvedById,
-      finalVerdict: analysis.draftVerdict,
+      finalVerdict,
     })
   }
 }

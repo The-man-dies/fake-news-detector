@@ -3,10 +3,18 @@
 
 import { Report } from './Report'
 import { Evidence } from './Evidence'
+import { DomainError } from '../../shared/errors'
+import { BusinessRuleError } from '../../shared/errors'
 
 export type CitizenStatus = 'ACTIVE' | 'DISABLED' | 'BANNED'
 export type CitizenType = 'REGULAR' | 'WATCHER'
-export type StatusReason = 'SPAM' | 'ABUSE' | 'FRAUD' | 'INACTIVITY' | 'USER_REQUEST' | 'OTHER'
+export type StatusReason =
+  | 'SPAM'
+  | 'ABUSE'
+  | 'FRAUD'
+  | 'INACTIVITY'
+  | 'USER_REQUEST'
+  | 'OTHER'
 
 export class Citizen {
   constructor(
@@ -53,9 +61,15 @@ export class Citizen {
   }
 
   // Business actions
-  submitReport(theme: string, title: string | null, content: string | null): Report {
+  submitReport(
+    theme: string,
+    title: string | null,
+    content: string | null,
+  ): Report {
     if (!this.canSubmitReport()) {
-      throw new Error('Cannot submit report: maximum open reports reached or account inactive')
+      throw new BusinessRuleError(
+        'Cannot submit report: maximum open reports reached or account inactive',
+      )
     }
     this.openReportsCount++
     this.incrementEngagementScore()
@@ -71,9 +85,13 @@ export class Citizen {
     )
   }
 
-  submitEvidence(investigationId: string, title: string, content: string): Evidence {
+  submitEvidence(
+    investigationId: string,
+    title: string,
+    content: string,
+  ): Evidence {
     if (!this.canSubmitEvidence()) {
-      throw new Error('Only watchers can submit evidence')
+      throw new BusinessRuleError('Only watchers can submit evidence')
     }
     this.incrementEngagementScore(2)
     this.updatedAt = new Date()
@@ -89,7 +107,9 @@ export class Citizen {
 
   applyForWatcher(): void {
     if (!this.canApplyForWatcher()) {
-      throw new Error('Cannot apply for watcher: must be active regular citizen')
+      throw new BusinessRuleError(
+        'Cannot apply for watcher: must be active regular citizen',
+      )
     }
     // WatcherApplication creation handled by application service
     this.updatedAt = new Date()
@@ -97,7 +117,7 @@ export class Citizen {
 
   promoteToWatcher(): void {
     if (this.citizenType === 'WATCHER') {
-      throw new Error('Already a watcher')
+      throw new DomainError('Already a watcher')
     }
     this.citizenType = 'WATCHER'
     this.updatedAt = new Date()
