@@ -3,7 +3,12 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "build": "bun build src/index.ts --outdir=dist",
-    "generate": "bunx prisma generate --config src/infrastructure/config/prisma.config.ts"
+    "generate": "bunx prisma generate --config src/infrastructure/config/prisma.config.ts",
+    "prisma:validate": "bunx prisma validate --config src/infrastructure/config/prisma.config.ts",
+    "lint": "bunx eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "bun test"
   },
   "dependencies": {
     "@hono/zod-openapi": "^1.2.2",

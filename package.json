@@ -1,5 +1,5 @@
 {
-  "name": "fake_news",
+  "name": "fake-news-detector",
   "type": "module",
   "private": true,
   "workspaces": [
@@ -9,17 +9,26 @@
   "scripts": {
     "dev": "bun run --filter '*' dev",
     "build": "bun run --filter '*' build",
+    "lint": "bunx eslint .",
     "clean": "rm -rf node_modules .turbo",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "bun run --filter '*' test"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/bun": "latest",
-    "prettier": "^3.8.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.5.0",
+    "prettier": "^3.8.3",
     "prettier-plugin-prisma": "^5.0.0",
     "prettier-plugin-tailwindcss": "^0.7.2"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "eslint": "^10.2.1",
+    "typescript-eslint": "^8.59.0"
   }
 }

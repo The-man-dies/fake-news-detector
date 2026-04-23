@@ -1,10 +1,10 @@
 // application/services/SecurityService.ts
 export class SecurityService {
-  async authenticate(token: string): Promise<boolean> {
+  async authenticate(_token: string): Promise<boolean> {
     return true
   }
 
-  async checkAccess(role: string, action: string): Promise<boolean> {
+  async checkAccess(_role: string, _action: string): Promise<boolean> {
     return true
   }
 }

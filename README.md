@@ -1,4 +1,4 @@
-# fake_news
+# fake-news-detector
 
 To install dependencies:
 

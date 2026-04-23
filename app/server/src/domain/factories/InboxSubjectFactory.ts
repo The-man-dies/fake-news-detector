@@ -2,30 +2,50 @@ import {
   InboxSubject,
   type InboxSubjectOrigin,
   type InboxSubjectStatus,
-} from '../value-objects/InboxSubject'
+} from "../entities/InboxSubject"
 import { Report } from '../entities/Report'
-import { randomUUID } from 'node:crypto'
+import { randomUUID } from 'crypto'
+import { DomainError } from "../../shared"
 
 type CreateInboxSubjectParams = {
-  adminId: string
   theme: string
   description: string
-  origin: InboxSubjectOrigin
+  createdById: string
+  status?: InboxSubjectStatus
+  origin?: InboxSubjectOrigin
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export class InboxSubjectFactory {
   static create(params: CreateInboxSubjectParams): InboxSubject {
-    const { adminId, theme, description, origin } = params
+    const { theme, description, createdById, status, origin, createdAt, updatedAt } = params
     const id = randomUUID()
     return new InboxSubject(
       id,
-      adminId,
       theme,
-      'OPEN' as InboxSubjectStatus,
       description,
+      createdById,
+      status,
       origin,
+      createdAt,
+      updatedAt,
     )
   }
 
-  static createFromExistingReport(params: Report): InboxSubject {}
+  static createFromDirector(directorId: string, theme: string, description: string): InboxSubject {
+    return this.create({
+      theme,
+      description,
+      createdById: directorId,
+      status: 'OPEN',
+      origin: 'DIRECTOR_INITIATED',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+  }
+
+  static createFromExistingReport(report: Report): InboxSubject {
+    throw new DomainError('Not implemented')
+  }
 }
