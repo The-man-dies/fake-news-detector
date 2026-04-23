@@ -14,9 +14,6 @@ jobs:
     client:
         name: 🎨 Web Checks
         runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: ./app/web
         steps:
             - name: Checkout repo
               uses: actions/checkout@v4
@@ -30,23 +27,24 @@ jobs:
               run: bun install
 
             - name: Lint (Eslint) 🔍
-              run: bun run lint
+              run: bun run --filter web lint
 
             - name: Type Check (TSC) 👀
-              run: bunx tsc --noEmit
+              run: bunx --cwd app/web tsc --noEmit
 
             - name: Prettier Check ✨
-              run: bunx prettier --check "src/**/*.{ts,tsx,js,json,css,md}"
+              run: bunx prettier --check "app/web/src/**/*.{ts,tsx,js,json,css,md}"
 
             - name: Build 🔨
-              run: bun run build
+              run: bun run --filter web build
 
     server:
         name: ⚙️ Server Checks
         runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: ./app/server
+        env:
+            DATABASE_URL: ${{ secrets.CI_DATABASE_URL != '' && secrets.CI_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/postgres' }}
+            DIRECT_URL: ${{ secrets.CI_DIRECT_URL != '' && secrets.CI_DIRECT_URL || 'postgresql://postgres:postgres@localhost:5432/postgres' }}
+
         steps:
             - name: Checkout repo
               uses: actions/checkout@v4
@@ -60,19 +58,19 @@ jobs:
               run: bun install
 
             - name: Generate Prisma Client 💎
-              run: bun run generate
+              run: bun run --filter server generate
 
             - name: Prisma Validate 🔍
-              run: bun run prisma:validate
+              run: bun run --filter server prisma:validate
 
             - name: Lint (Eslint) 🔍
-              run: bun run lint
+              run: bun run --filter server lint
 
             - name: Prettier Check ✨
-              run: bunx prettier --check "src/**/*.{ts,js,json,md}"
+              run: bunx prettier --check "app/server/src/**/*.{ts,js,json,md}"
 
             - name: Type Check (TSC) 👀
-              run: bunx tsc --noEmit
+              run: bunx --cwd app/server tsc --noEmit
 
             - name: Build 🔨
-              run: bun run build
+              run: bun run --filter server build

@@ -11,10 +11,10 @@ type CreateInboxSubjectParams = {
   theme: string
   description: string
   createdById: string
-  status: InboxSubjectStatus
-  origin: InboxSubjectOrigin
-  createdAt: Date
-  updatedAt: Date
+  status?: InboxSubjectStatus
+  origin?: InboxSubjectOrigin
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export class InboxSubjectFactory {
