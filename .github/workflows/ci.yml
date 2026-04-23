@@ -30,7 +30,7 @@ jobs:
               run: bun run --filter web lint
 
             - name: Type Check (TSC) 👀
-              run: bunx --cwd app/web tsc --noEmit
+              run: bunx tsc --noEmit -p app/web/tsconfig.json
 
             - name: Prettier Check ✨
               run: bunx prettier --check "app/web/src/**/*.{ts,tsx,js,json,css,md}"
@@ -42,8 +42,10 @@ jobs:
         name: ⚙️ Server Checks
         runs-on: ubuntu-latest
         env:
-            DATABASE_URL: ${{ secrets.CI_DATABASE_URL != '' && secrets.CI_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/postgres' }}
-            DIRECT_URL: ${{ secrets.CI_DIRECT_URL != '' && secrets.CI_DIRECT_URL || 'postgresql://postgres:postgres@localhost:5432/postgres' }}
+            DATABASE_URL: ${{ secrets.CI_DATABASE_URL != '' && secrets.CI_DATABASE_URL ||
+                'postgresql://postgres:postgres@localhost:5432/postgres' }}
+            DIRECT_URL: ${{ secrets.CI_DIRECT_URL != '' && secrets.CI_DIRECT_URL ||
+                'postgresql://postgres:postgres@localhost:5432/postgres' }}
 
         steps:
             - name: Checkout repo
@@ -70,7 +72,7 @@ jobs:
               run: bunx prettier --check "app/server/src/**/*.{ts,js,json,md}"
 
             - name: Type Check (TSC) 👀
-              run: bunx --cwd app/server tsc --noEmit
+              run: bunx tsc --noEmit -p app/server/tsconfig.json
 
             - name: Build 🔨
               run: bun run --filter server build
