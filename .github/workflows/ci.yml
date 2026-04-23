@@ -1,61 +1,78 @@
 name: CI
 
+permissions:
+    contents: read
+
 on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+    workflow_dispatch:
 
 jobs:
-  test-and-build:
-    runs-on: ubuntu-latest
+    client:
+        name: 🎨 Web Checks
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./app/web
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+            - name: Install dependencies
+              run: bun install
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
+            - name: Lint (Eslint) 🔍
+              run: bun run lint
 
-      - name: Install dependencies (server)
-        run: |
-          cd app/server
-          bun install
+            - name: Type Check (TSC) 👀
+              run: bunx tsc --noEmit
 
-      - name: Install dependencies (web)
-        run: |
-          cd app/web
-          npm ci
+            - name: Prettier Check ✨
+              run: bunx prettier --check "src/**/*.{ts,tsx,js,json,css,md}"
 
-      - name: Generate Prisma client
-        run: |
-          cd app/server
-          bunx run generate
+            - name: Build 🔨
+              run: bun run build
 
-      - name: Lint web app
-        run: |
-          cd app/web
-          bun run lint
+    server:
+        name: ⚙️ Server Checks
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ./app/server
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
 
-      - name: Build server
-        run: |
-          cd app/server
-          bun run build
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
 
-      - name: Build web app
-        run: |
-          cd app/web
-          npm run build
+            - name: Install dependencies
+              run: bun install
 
-      - name: Run tests (if any)
-        run: |
-          # Add test commands here when you have tests
-          echo "No tests configured yet"
+            - name: Generate Prisma Client 💎
+              run: bun run generate
+
+            - name: Prisma Validate 🔍
+              run: bun run prisma:validate
+
+            - name: Lint (Eslint) 🔍
+              run: bun run lint
+
+            - name: Prettier Check ✨
+              run: bunx prettier --check "src/**/*.{ts,js,json,md}"
+
+            - name: Type Check (TSC) 👀
+              run: bunx tsc --noEmit
+
+            - name: Build 🔨
+              run: bun run build
