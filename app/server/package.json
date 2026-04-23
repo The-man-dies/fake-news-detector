@@ -2,7 +2,8 @@
   "name": "server",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun build src/index.ts --outdir=dist"
+    "build": "bun build src/index.ts --outdir=dist",
+    "generate": "bunx prisma generate --config src/infrastructure/config/prisma.config.ts"
   },
   "dependencies": {
     "@hono/zod-openapi": "^1.2.2",

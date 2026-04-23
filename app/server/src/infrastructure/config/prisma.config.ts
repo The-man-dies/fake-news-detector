@@ -4,7 +4,7 @@ import { defineConfig, env } from 'prisma/config'
 const isMigration = process.argv.includes('migrate')
 
 export default defineConfig({
-  schema: 'prisma/schema.prisma',
+  schema: './prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
   },
