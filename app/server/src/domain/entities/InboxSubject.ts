@@ -1,5 +1,7 @@
 // domain/entities/InboxSubject.ts
 
+import { BusinessRuleError } from '../../shared/errors'
+
 export type InboxSubjectStatus = 'OPEN' | 'IN_PROGRESS' | 'ARCHIVED'
 export type InboxSubjectOrigin = 'REPORT' | 'DIRECTOR_INITIATED'
 
@@ -36,7 +38,7 @@ export class InboxSubject {
 
   startProgress(): void {
     if (this.status === 'ARCHIVED') {
-      throw new Error('Cannot start progress on archived subject')
+      throw new BusinessRuleError('Cannot start progress on archived subject')
     }
     this.status = 'IN_PROGRESS'
     this.updatedAt = new Date()

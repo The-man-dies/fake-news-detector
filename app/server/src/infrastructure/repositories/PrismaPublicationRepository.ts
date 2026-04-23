@@ -1,6 +1,6 @@
 // infrastructure/persistence/PrismaPublicationRepository.ts
-import { IPublicationRepository } from '../domain/repositories'
-import { Publication } from '../domain/entities/Publication'
+import { IPublicationRepository } from '../../domain'
+import { Publication } from '../../domain'
 
 export class PrismaPublicationRepository implements IPublicationRepository {
   async save(publication: Publication): Promise<void> {

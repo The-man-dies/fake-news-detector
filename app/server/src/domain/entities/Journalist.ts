@@ -3,9 +3,17 @@
 
 import { Investigation, MediaCategory, Verdict } from './Investigation'
 import { Report } from './Report'
+import { BusinessRuleError, DomainError } from '../../shared/errors'
+import { MAX_CORRECTION_ATTEMPTS } from '../../shared'
 
 export type JournalistStatus = 'ACTIVE' | 'DISABLED' | 'BANNED'
-export type StatusReason = 'SPAM' | 'ABUSE' | 'FRAUD' | 'INACTIVITY' | 'USER_REQUEST' | 'OTHER'
+export type StatusReason =
+  | 'SPAM'
+  | 'ABUSE'
+  | 'FRAUD'
+  | 'INACTIVITY'
+  | 'USER_REQUEST'
+  | 'OTHER'
 
 export class Journalist {
   constructor(
@@ -34,7 +42,10 @@ export class Journalist {
 
   // Capabilities
   canAnalyze(): boolean {
-    return this.isActive() && this.activeInvestigationsCount < this.maxActiveInvestigations
+    return (
+      this.isActive() &&
+      this.activeInvestigationsCount < this.maxActiveInvestigations
+    )
   }
 
   canPickReport(): boolean {
@@ -44,10 +55,12 @@ export class Journalist {
   // Business actions
   pickReport(report: Report): Investigation {
     if (!this.canPickReport()) {
-      throw new Error('Cannot pick report: maximum active investigations reached')
+      throw new BusinessRuleError(
+        'Cannot pick report: maximum active investigations reached',
+      )
     }
     if (!report.canBePicked()) {
-      throw new Error('Report is not available for picking')
+      throw new BusinessRuleError('Report is not available for picking')
     }
 
     this.activeInvestigationsCount++
@@ -75,25 +88,30 @@ export class Journalist {
     investigationNotes: string,
   ): void {
     if (investigation.journalistId !== this.id) {
-      throw new Error('Cannot submit: investigation belongs to another journalist')
+      throw new BusinessRuleError(
+        'Cannot submit: investigation belongs to another journalist',
+      )
     }
     investigation.updateDraft(mediaCategory, draftVerdict, investigationNotes)
   }
 
   submitForReview(investigation: Investigation): void {
     if (investigation.journalistId !== this.id) {
-      throw new Error('Cannot submit: investigation belongs to another journalist')
+      throw new BusinessRuleError(
+        'Cannot submit: investigation belongs to another journalist',
+      )
     }
     investigation.submitForReview()
   }
 
-
   correctInvestigation(investigation: Investigation, notes: string): void {
     if (investigation.journalistId !== this.id) {
-      throw new Error('Cannot correct: investigation belongs to another journalist')
+      throw new BusinessRuleError(
+        'Cannot correct: investigation belongs to another journalist',
+      )
     }
-    if (investigation.attemptCount >= 1000) {
-      throw new Error('Maximum correction attempts reached')
+    if (investigation.attemptCount >= MAX_CORRECTION_ATTEMPTS) {
+      throw new DomainError('Maximum correction attempts reached')
     }
     investigation.updateDraft(
       investigation.mediaCategory,
@@ -104,8 +122,8 @@ export class Journalist {
 
   onInvestigationPublished(investigation: Investigation): void {
     if (
-      investigation.journalistId === this.id && 
-      this.activeInvestigationsCount > 0 && 
+      investigation.journalistId === this.id &&
+      this.activeInvestigationsCount > 0 &&
       investigation.status === 'PUBLISHED'
     ) {
       this.activeInvestigationsCount--

@@ -1,8 +1,23 @@
 // domain/entities/Investigation.ts
+import { DomainError, BusinessRuleError } from '../../shared/errors'
+import { MAX_REVISION_ATTEMPTS } from '../../shared/constants'
 
-export type MediaCategory = 'CONTEXT_COLLAPSE' | 'MANIPULATED' | 'FABRICATED' | 'SATIRE' | 'MISLEADING' | 'IMPOSTOR' | 'OTHER'
+export type MediaCategory =
+  | 'CONTEXT_COLLAPSE'
+  | 'MANIPULATED'
+  | 'FABRICATED'
+  | 'SATIRE'
+  | 'MISLEADING'
+  | 'IMPOSTOR'
+  | 'OTHER'
 export type Verdict = 'TRUE' | 'FALSE' | 'MISLEADING' | 'UNVERIFIABLE'
-export type InvestigationStatus = 'OPEN' | 'IN_PROGRESS' | 'PENDING_REVIEW' | 'NEEDS_REVISION' | 'PUBLISHED' | 'UNVERIFIABLE'
+export type InvestigationStatus =
+  | 'OPEN'
+  | 'IN_PROGRESS'
+  | 'PENDING_REVIEW'
+  | 'NEEDS_REVISION'
+  | 'PUBLISHED'
+  | 'UNVERIFIABLE'
 
 export class Investigation {
   constructor(
@@ -31,7 +46,11 @@ export class Investigation {
   }
 
   canBeEdited(): boolean {
-    return this.status === 'OPEN' || this.status === 'IN_PROGRESS' || this.status === 'NEEDS_REVISION'
+    return (
+      this.status === 'OPEN' ||
+      this.status === 'IN_PROGRESS' ||
+      this.status === 'NEEDS_REVISION'
+    )
   }
 
   // Journalist actions
@@ -41,7 +60,9 @@ export class Investigation {
     investigationNotes: string,
   ): void {
     if (!this.canBeEdited()) {
-      throw new Error('Investigation cannot be edited in current status')
+      throw new BusinessRuleError(
+        'Investigation cannot be edited in current status',
+      )
     }
     this.mediaCategory = mediaCategory
     this.draftVerdict = draftVerdict
@@ -51,22 +72,24 @@ export class Investigation {
 
   submitForReview(): void {
     if (!this.canBeEdited()) {
-      throw new Error('Cannot submit investigation for review')
+      throw new BusinessRuleError('Cannot submit investigation for review')
     }
     if (!this.mediaCategory) {
-      throw new Error('Investigation must have media category before submission')
+      throw new BusinessRuleError(
+        'Investigation must have media category before submission',
+      )
     }
     this.status = 'PENDING_REVIEW'
     this.updatedAt = new Date()
   }
 
   // Director rejection
-  requestRevision(newStatus: InvestigationStatus, comment: string): void {
+  requestRevision(newStatus: InvestigationStatus): void {
     if (newStatus !== 'NEEDS_REVISION' && newStatus !== 'UNVERIFIABLE') {
-      throw new Error('Invalid status for rejection')
+      throw new BusinessRuleError('Invalid status for rejection')
     }
-    if (this.attemptCount >= 1000) {
-      throw new Error('Maximum rejection attempts reached')
+    if (this.attemptCount >= MAX_REVISION_ATTEMPTS) {
+      throw new DomainError('Maximum rejection attempts reached')
     }
     this.status = newStatus
     this.attemptCount++
@@ -76,7 +99,9 @@ export class Investigation {
   // Director approval
   approve(): void {
     if (this.status !== 'PENDING_REVIEW') {
-      throw new Error('Investigation must be pending review to be approved')
+      throw new BusinessRuleError(
+        'Investigation must be pending review to be approved',
+      )
     }
     this.status = 'PUBLISHED'
     this.updatedAt = new Date()
