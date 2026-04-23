@@ -8,7 +8,7 @@ export class QueryService {
     private reportRepository: IReportRepository,
     private analysisRepository: IAnalysisRepository,
     private userRepository: IUserRepository,
-  ) {}
+  ) { }
 
   async getCitizenHistory(citizenId: string): Promise<any> {
     return await this.reportRepository.findByCitizenId(citizenId)

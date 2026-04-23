@@ -3,8 +3,8 @@
 import { IEmailService } from '../../domain/interfaces/IEmailService'
 
 export class EmailAdapter implements IEmailService {
-  async send(to: string, subject: string, body: string): Promise<void> {
-    // Implémentation avec Nodemailer ou SendGrid
+  async send(to: string, subject: string, _body: string): Promise<void> {
+    // Implemented   with Nodemailer or SendGrid
     console.log(`Sending email to ${to}: ${subject}`)
   }
 
@@ -14,7 +14,7 @@ export class EmailAdapter implements IEmailService {
     body: string,
   ): Promise<void> {
     await Promise.all(
-      recipients.map((recipients) => this.send(recipients, subject, body)),
+      recipients.map((recipient) => this.send(recipient, subject, body)),
     )
   }
 }

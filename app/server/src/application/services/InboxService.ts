@@ -9,7 +9,7 @@ export class InboxService {
   constructor(
     private inboxSubjectRepository: IInboxSubjectRepository,
     private reportRepository: IReportRepository,
-  ) {}
+  ) { }
 
   async buildInboxSubjectFromReport(reportId: string): Promise<InboxSubject> {
     const report = await this.reportRepository.findById(reportId)
