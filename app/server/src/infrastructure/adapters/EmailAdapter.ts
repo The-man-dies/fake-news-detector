@@ -13,9 +13,8 @@ export class EmailAdapter implements IEmailService {
     subject: string,
     body: string,
   ): Promise<void> {
-    // Implémentation bulk
-    for (const recipient of recipients) {
-      await this.send(recipient, subject, body)
-    }
+    await Promise.all(
+      recipients.map((recipients) => this.send(recipients, subject, body)),
+    )
   }
 }

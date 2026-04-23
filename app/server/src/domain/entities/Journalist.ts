@@ -4,6 +4,7 @@
 import { Investigation, MediaCategory, Verdict } from './Investigation'
 import { Report } from './Report'
 import { BusinessRuleError, DomainError } from '../../shared/errors'
+import { MAX_CORRECTION_ATTEMPTS } from '../../shared'
 
 export type JournalistStatus = 'ACTIVE' | 'DISABLED' | 'BANNED'
 export type StatusReason =
@@ -109,7 +110,7 @@ export class Journalist {
         'Cannot correct: investigation belongs to another journalist',
       )
     }
-    if (investigation.attemptCount >= 1000) {
+    if (investigation.attemptCount >= MAX_CORRECTION_ATTEMPTS) {
       throw new DomainError('Maximum correction attempts reached')
     }
     investigation.updateDraft(

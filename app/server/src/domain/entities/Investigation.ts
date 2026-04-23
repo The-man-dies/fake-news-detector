@@ -1,6 +1,6 @@
 // domain/entities/Investigation.ts
-import { DomainError } from '../../shared/errors'
-import { BusinessRuleError } from '../../shared/errors'
+import { DomainError, BusinessRuleError } from '../../shared/errors'
+import { MAX_REVISION_ATTEMPTS } from '../../shared/constants'
 
 export type MediaCategory =
   | 'CONTEXT_COLLAPSE'
@@ -88,7 +88,7 @@ export class Investigation {
     if (newStatus !== 'NEEDS_REVISION' && newStatus !== 'UNVERIFIABLE') {
       throw new BusinessRuleError('Invalid status for rejection')
     }
-    if (this.attemptCount >= 1000) {
+    if (this.attemptCount >= MAX_REVISION_ATTEMPTS) {
       throw new DomainError('Maximum rejection attempts reached')
     }
     this.status = newStatus

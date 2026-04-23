@@ -19,7 +19,7 @@ export class PublicationFactory {
       params.investigationId,
       params.approvedById,
       params.finalVerdict,
-      new Date(),
+      params.publishedAt ?? new Date(),
       params.isCorrection || false,
       new Date(),
       new Date(),
