@@ -178,6 +178,14 @@ export async function runAgent(type, inputs) {
   }
 }
 
+function sanitizePrompt(text) {
+  // Remove control characters except common whitespace
+  // eslint-disable-next-line no-control-regex
+  return text
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // Remove control chars except \t, \n, \r
+    .replace(/[\u200B-\u200D\uFEFF]/g, '') // Remove zero-width spaces
+}
+
 function groqGenerate(prompt) {
   return new Promise((resolve, reject) => {
     const apiKey = process.env.GROQ_API_KEY
@@ -186,15 +194,20 @@ function groqGenerate(prompt) {
       return
     }
 
-    const data = JSON.stringify({
+    // Sanitize prompt to avoid JSON encoding issues
+    const cleanPrompt = sanitizePrompt(prompt)
+
+    const payload = {
       model: 'llama-3.3-70b-versatile',
       messages: [
         { role: 'system', content: 'You are a DDD expert analyzing code changes. Always respond with valid JSON only.' },
-        { role: 'user', content: prompt }
+        { role: 'user', content: cleanPrompt }
       ],
       temperature: 0.3,
       max_tokens: 4096
-    })
+    }
+
+    const data = JSON.stringify(payload)
 
     const options = {
       hostname: 'api.groq.com',
