@@ -64,8 +64,8 @@ model VerifiedLink {
 
   url String
 
-  authoritySourceId String
-  authoritySource AuthoritySource @relation(fields: [authoritySourceId], references: [id])
+  authoritySourceId String?
+  authoritySource   AuthoritySource? @relation(fields: [authoritySourceId], references: [id])
 
   publicationId String
   publication   Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
