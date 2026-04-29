@@ -1,4 +1,4 @@
-import { spawnSync } from 'child_process'
+import http from 'http'
 
 // ==========================================
 // SYSTEM PROMPTS FOR ALL AGENTS
@@ -155,41 +155,74 @@ Follow the provided TEMPLATE exactly, replacing X/10 with actual scores and fill
 
 export async function runAgent(type, inputs) {
   console.log(`  🤖 Starting ${type} agent...`)
-  
+
   const systemPrompt = SYSTEM_PROMPTS[type]
   const userPrompt = buildUserPrompt(type, inputs)
-  
+
   const fullPrompt = `${systemPrompt}\n\n---USER INPUT---\n${userPrompt}`
   const promptLength = fullPrompt.length
-  console.log(`     Prompt size: ${promptLength} chars (truncated to 8000)`)
-  
+  console.log(`     Prompt size: ${promptLength} chars (truncated to 50000)`)
+
   try {
-    const promptArg = fullPrompt.substring(0, 8000)
-    console.log(`     Calling Ollama...`)
-    
-    const { stdout, stderr, status, error } = spawnSync(
-      'ollama',
-      ['run', 'qwen2.5-coder:3b', promptArg],
-      { timeout: 300000, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 }
-    )
+    const promptArg = fullPrompt.substring(0, 50000)
+    console.log(`     Calling Ollama API...`)
 
-    if (error) {
-      console.error(`     ❌ Spawn error for ${type}:`, error.message)
-      throw error
-    }
+    const response = await ollamaGenerate(promptArg)
 
-    if (status !== 0) {
-      console.error(`     ❌ Ollama exited with status ${status}:`, stderr)
-      throw new Error(stderr || `Ollama execution failed with status ${status}`)
-    }
-
-    console.log(`     ✅ ${type} agent completed (output: ${stdout.length} chars)`)
-    return parseAgentOutput(stdout, type)
+    console.log(`     ✅ ${type} agent completed (output: ${response.length} chars)`)
+    return parseAgentOutput(response, type)
   } catch (error) {
     console.error(`     ⚠️ Agent ${type} failed:`, error.message)
     console.log(`     🔄 Using default response for ${type}`)
     return getDefaultResponse(type)
   }
+}
+
+function ollamaGenerate(prompt) {
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify({
+      model: 'qwen2.5-coder:3b',
+      prompt: prompt,
+      stream: false
+    })
+
+    const options = {
+      hostname: 'localhost',
+      port: 11434,
+      path: '/api/generate',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length
+      }
+    }
+
+    const req = http.request(options, (res) => {
+      let body = ''
+      res.on('data', (chunk) => { body += chunk })
+      res.on('end', () => {
+        if (res.statusCode !== 200) {
+          reject(new Error(`HTTP ${res.statusCode}: ${body}`))
+        } else {
+          try {
+            const json = JSON.parse(body)
+            resolve(json.response || '')
+          } catch (e) {
+            reject(new Error(`Invalid JSON response: ${e.message}`))
+          }
+        }
+      })
+    })
+
+    req.on('error', (err) => reject(err))
+    req.setTimeout(300000, () => {
+      req.destroy()
+      reject(new Error('Request timeout'))
+    })
+
+    req.write(data)
+    req.end()
+  })
 }
 
 function buildUserPrompt(type, inputs) {
