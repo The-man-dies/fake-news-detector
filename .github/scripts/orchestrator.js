@@ -208,6 +208,9 @@ function groqGenerate(prompt) {
     }
 
     const data = JSON.stringify(payload)
+    const dataLength = Buffer.byteLength(data, 'utf8')
+
+    console.log(`     📤 Sending ${dataLength} bytes to Groq...`)
 
     const options = {
       hostname: 'api.groq.com',
@@ -217,7 +220,7 @@ function groqGenerate(prompt) {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'Content-Length': data.length
+        'Content-Length': dataLength
       }
     }
 
