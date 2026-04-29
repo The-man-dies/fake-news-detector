@@ -1,4 +1,4 @@
-import { execSync } from 'child_process'
+import { spawnSync } from 'child_process'
 
 // ==========================================
 // SYSTEM PROMPTS FOR ALL AGENTS
@@ -160,12 +160,18 @@ export async function runAgent(type, inputs) {
   const fullPrompt = `${systemPrompt}\n\n---USER INPUT---\n${userPrompt}`
   
   try {
-    const output = execSync(
-      `ollama run qwen2.5-coder:3b "${fullPrompt.replace(/"/g, '\\"').substring(0, 8000)}"`,
-      { timeout: 120000 }
-    ).toString()
-    
-    return parseAgentOutput(output)
+    const promptArg = fullPrompt.substring(0, 8000)
+    const { stdout, stderr, status } = spawnSync(
+      'ollama',
+      ['run', 'qwen2.5-coder:3b', promptArg],
+      { timeout: 120000, encoding: 'utf-8', maxBuffer: 1024 * 1024 }
+    )
+
+    if (status !== 0) {
+      throw new Error(stderr || 'Ollama execution failed')
+    }
+
+    return parseAgentOutput(stdout)
   } catch (error) {
     console.error(`Agent ${type} failed:`, error.message)
     return getDefaultResponse(type)
