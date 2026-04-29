@@ -18,17 +18,25 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install jq
+        run: apt-get update && apt-get install -y jq
+
+      - name: Cache Ollama model
+        uses: actions/cache@v4
+        id: cache-ollama
+        with:
+          path: ~/.ollama/models
+          key: ${{ runner.os }}-ollama-qwen2.5-coder-3b
+
       - name: Install Ollama
         run: curl -fsSL https://ollama.com/install.sh | sh
 
       - name: Pull model
+        if: steps.cache-ollama.outputs.cache-hit != 'true'
         run: ollama pull qwen2.5-coder:3b
 
       - name: Run DDD Review System
-        run: node .github/scripts/run-agents.js
-      
-      - name: Install jq
-        run: apt-get update && apt-get install -y jq  
+        run: node .github/scripts/run-agents.js  
 
       - name: Fail CI if HIGH severity
         run: |
