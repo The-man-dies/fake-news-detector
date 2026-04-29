@@ -1,6 +1,6 @@
 // application/services/FactCheckingService.ts
 import { IReportRepository } from '../../domain/repositories/IReportRepository'
-import { IAnalysisRepository } from '../../domain/repositories/IAnalysisRepository'
+import { IInvestigationRepository } from '../../domain/repositories'
 import { IUserRepository } from '../../domain/repositories/IUserRepository'
 import { IPublicationRepository } from '../../domain/repositories/IPublicationRepository'
 import { IWatcherApplicationRepository } from '../../domain/repositories/IWatcherApplicationRepository'

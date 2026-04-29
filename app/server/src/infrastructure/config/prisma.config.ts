@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { defineConfig, env } from 'prisma/config'
 
-const isMigration = process.argv.includes('migrate')
+const isMigration = process.argv.includes('migrate') || process.argv.includes('push')
 
 export default defineConfig({
   schema: './prisma/schema.prisma',
