@@ -6,8 +6,9 @@ import { runDDDReview } from './orchestrator.js'
 // LOAD INPUTS
 // ==========================================
 
-// Diff PR
-const diff = execSync('git diff origin/main').toString()
+// Diff PR - use GITHUB_BASE_REF for compatibility
+const baseRef = process.env.GITHUB_BASE_REF || 'main'
+const diff = execSync(`git diff origin/${baseRef}`).toString()
 
 // Focused context (only ddd-summary.md, not all doc/)
 const dddSummary = fs.readFileSync('doc/ddd-summary.md', 'utf-8')
