@@ -194,19 +194,33 @@ export async function runAgent(type, inputs) {
   const promptLength = fullPrompt.length
   console.log(`     Prompt size: ${promptLength} chars (truncated to ${config.maxPromptChars})`)
 
-  try {
-    const promptArg = fullPrompt.substring(0, config.maxPromptChars)
-    console.log('     Calling Groq API...')
+  const promptArg = fullPrompt.substring(0, config.maxPromptChars)
 
-    const response = await groqGenerate(promptArg, config.maxOutputTokens)
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      console.log(`     Calling Groq API... (attempt ${attempt}/3)`)
 
-    console.log(`     ${type} agent completed (output: ${response.length} chars)`)
-    return parseAgentOutput(response, type)
-  } catch (error) {
-    console.error(`     Agent ${type} failed:`, error.message)
-    console.log(`     Using default response for ${type}`)
-    return getDefaultResponse(type)
+      const response = await groqGenerate(promptArg, config.maxOutputTokens)
+
+      console.log(`     ${type} agent completed (output: ${response.length} chars)`)
+      return parseAgentOutput(response, type)
+    } catch (error) {
+      const retryDelayMs = getRetryDelayMs(error.message, attempt)
+
+      if (attempt < 3 && retryDelayMs !== null) {
+        console.error(`     Agent ${type} rate limited:`, error.message)
+        console.log(`     Waiting ${retryDelayMs}ms before retry...`)
+        await sleep(retryDelayMs)
+        continue
+      }
+
+      console.error(`     Agent ${type} failed:`, error.message)
+      console.log(`     Using default response for ${type}`)
+      return getDefaultResponse(type)
+    }
   }
+
+  return getDefaultResponse(type)
 }
 
 function logPromptBudget(type, inputs) {
@@ -231,6 +245,26 @@ function logPromptBudget(type, inputs) {
 
   console.log(`     Budget: prompt<=${config.maxPromptChars || 'n/a'} chars, output<=${config.maxOutputTokens || 'n/a'} tokens`)
   console.log(`     Sections: diff=${originalDiff}->${compactedDiff} ddd=${originalDdd}->${compactedDdd} readme=${originalReadme}->${compactedReadme}`)
+}
+
+function getRetryDelayMs(message = '', attempt = 1) {
+  if (!message.includes('HTTP 429')) {
+    return null
+  }
+
+  const retryMatch = message.match(/Please try again in ([0-9.]+)s/i)
+  if (retryMatch) {
+    const seconds = Number.parseFloat(retryMatch[1])
+    if (Number.isFinite(seconds)) {
+      return Math.ceil(seconds * 1000) + 1000
+    }
+  }
+
+  return attempt * 5000
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 function sanitizePrompt(text) {
@@ -468,11 +502,9 @@ function getDefaultResponse(type) {
 export async function runDDDReview(diff, dddSummary, readme, template) {
   console.log('Starting DDD Multi-Agent Review...\n')
 
-  const [domain, application, infrastructure] = await Promise.all([
-    runAgent('domain', { diff, dddSummary, readme }),
-    runAgent('application', { diff, dddSummary, readme }),
-    runAgent('infrastructure', { diff, dddSummary, readme })
-  ])
+  const domain = await runAgent('domain', { diff, dddSummary, readme })
+  const application = await runAgent('application', { diff, dddSummary, readme })
+  const infrastructure = await runAgent('infrastructure', { diff, dddSummary, readme })
 
   console.log('Domain Score:', domain.score)
   console.log('Application Score:', application.score)
