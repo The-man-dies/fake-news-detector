@@ -1,0 +1,352 @@
+@startuml
+skinparam handwritten false
+skinparam shadowless true
+skinparam defaultFontName "Arial"
+skinparam RoundCorner 10
+
+' --- Couleurs Pédagogiques ---
+!define DOMAIN_BG #EEF4F9
+!define APP_BG #FFF5E6
+!define SERVICE_BG #F0F9F0
+!define INFRA_BG #F8F9FA
+!define BORDER_COLOR #B0C4DE
+
+note "Architecture DDD corrigée basée sur l'implémentation réelle\n- Actor unifie Citoyen, Journaliste et Directeur via le champ role\n- Investigation remplace Analyse avec cycle de vie complet\n- Evidence est soumise par les Watchers (citoyens promus)\n- Publication contient les vérifications finales" as N1
+
+' ==========================================
+' COUCHE DOMAINE
+' ==========================================
+package "Couche Domaine (Logique Métier)" <<Rectangle>> {
+
+    class "Actor" as Actor << (A,DOMAIN_BG) >> {
+        **Attributs**
+        - id: String
+        - name: String
+        - email: String
+        - role: Role (CITIZEN/JOURNALIST/EDITORIAL_DIRECTOR)
+        - status: AccountStatus (ACTIVE/DISABLED/BANNED)
+        - citizenType: CitizenType (REGULAR/WATCHER)
+        - engagementScore: Int
+        - lastInboxRead: DateTime
+        - statusReason: StatusReason?
+        - statusReasonDetails: String?
+        --
+        **Comportements communs**
+        - isActive(): Boolean
+        - canLogin(): Boolean
+        - incrementEngagementScore(points)
+        - markInboxAsRead()
+    }
+
+    class "Citizen" as Citizen << (E,DOMAIN_BG) >> {
+        **Attributs spécifiques**
+        - openReportsCount: Int
+        - maxOpenReports: Int = 3
+        --
+        **Comportements**
+        - canSubmitReport(): Boolean
+        - canSubmitEvidence(): Boolean
+        - canApplyForWatcher(): Boolean
+        - isWatcher(): Boolean
+        - submitReport(theme, title, content): Report
+        - submitEvidence(investigationId, title, content): Evidence
+        - applyForWatcher(): void
+        - promoteToWatcher(): void
+        - reportResolved(): void
+        - ban(reason, details): void
+        - disable(reason, details): void
+        - activate(): void
+        - getProfile(): Object
+    }
+
+    class "Journalist" as Journalist << (E,DOMAIN_BG) >> {
+        **Attributs spécifiques**
+        - activeInvestigationsCount: Int
+        - maxActiveInvestigations: Int = 1
+        --
+        **Comportements**
+        - canAnalyze(): Boolean
+        - canPickReport(): Boolean
+        - pickReport(report): Investigation
+        - submitInvestigationDraft(investigation, category, verdict, notes): void
+        - submitForReview(investigation): void
+        - correctInvestigation(investigation, notes): void
+        - onInvestigationPublished(investigation): void
+        - ban(reason, details): void
+        - disable(reason, details): void
+        - activate(): void
+        - getHistory(): Object
+    }
+
+    class "Director" as Director << (E,DOMAIN_BG) >> {
+        **Attributs spécifiques**
+        - status: DirectorStatus (ACTIVE/DISABLED)
+        --
+        **Comportements**
+        - validateInvestigation(investigation): void
+        - rejectInvestigation(investigation, newStatus): void
+        - publishInvestigation(investigation): void
+        - markAsUnverifiable(investigation): void
+        - approveWatcherApplication(application): void
+        - rejectWatcherApplication(application): void
+        - banCitizen(citizen, reason, details): void
+        - disableCitizen(citizen, reason, details): void
+        - activateCitizen(citizen): void
+        - banJournalist(journalist, reason, details): void
+        - disableJournalist(journalist, reason, details): void
+        - activateJournalist(journalist): void
+        - createInboxSubject(theme, description): InboxSubject
+        - archiveInboxSubject(subject): void
+    }
+
+    class "Report" as Report << (E,DOMAIN_BG) >> {
+        **Attributs**
+        - id: String
+        - citizenId: String
+        - theme: String
+        - title: String?
+        - content: String?
+        - status: ReportStatus
+        --
+        **Comportements**
+        - isOpen(): Boolean
+        - canBePicked(): Boolean
+        - changeStatus(newStatus): void
+        - updateContent(title, content, theme): void
+    }
+
+    class "Investigation" as Investigation << (E,DOMAIN_BG) >> {
+        **Attributs**
+        - id: String
+        - reportId: String
+        - journalistId: String
+        - mediaCategory: MediaCategory?
+        - draftVerdict: Verdict
+        - investigationNotes: String
+        - attemptCount: Int
+        - status: InvestigationStatus
+        --
+        **Comportements**
+        - isDraft(): Boolean
+        - isPendingReview(): Boolean
+        - isPublished(): Boolean
+        - canBeEdited(): Boolean
+        - updateDraft(category, verdict, notes): void
+        - submitForReview(): void
+        - requestRevision(newStatus): void
+        - approve(): void
+        - markAsUnverifiable(): void
+    }
+
+    class "Evidence" as Evidence << (E,DOMAIN_BG) >> {
+        **Attributs**
+        - id: String
+        - content: String
+        - title: String
+        - investigationId: String
+        - watcherId: String
+        --
+        **Comportements**
+        - (soumis par les Watchers via le service applicatif)
+    }
+
+    class "AuthoritySource" as AuthoritySource << (V,DOMAIN_BG) >> {
+        **Attributs**
+        - id: String
+        - name: String
+        - type: SourceType
+    }
+
+    class "Publication" as Publication << (A,DOMAIN_BG) >> {
+        **Attributs**
+        - id: String
+        - investigationId: String
+        - approvedById: String
+        - finalVerdict: Verdict
+        - publishedAt: DateTime
+        - isCorrection: Boolean
+        --
+        **Comportements**
+        - (génère les notifications automatiquement)
+    }
+
+    class "Notification" as Notification << (E,DOMAIN_BG) >> {
+        **Attributs**
+        - id: String
+        - type: NotificationType
+        - theme: String
+        - message: String
+        - isActive: Boolean
+        - actorId: String
+        - publicationId: String?
+    }
+
+    class "InboxSubject" as InboxSubject << (V,DOMAIN_BG) >> {
+        **Attributs**
+        - id: String
+        - theme: String
+        - description: String
+        - createdById: String
+        - status: InboxSubjectStatus
+        - origin: InboxSubjectOrigin
+        --
+        **Comportements**
+        - archive(): void
+    }
+
+    class "WatcherApplication" as WatcherApp << (E,DOMAIN_BG) >> {
+        **Attributs**
+        - id: String
+        - applicantId: String
+        - status: WatcherApplicationStatus
+        --
+        **Comportements**
+        - approve(): void
+        - reject(): void
+    }
+
+    ' Relations de domaine
+    Actor <|-- Citizen
+    Actor <|-- Journalist  
+    Actor <|-- Director
+
+    Citizen "1" -- "0..*" Report : soumet >
+    Report "1" -- "0..1" Investigation : fait l'objet de >
+    Journalist "1" -- "0..*" Investigation : rédige >
+    Investigation "1" -- "0..*" Evidence : contient >
+    Evidence "0..*" -- "1" Citizen : soumis par (Watcher) >
+    
+    Investigation "1" -- "0..1" Publication : publie >
+    Publication "1" -- "0..*" Notification : génère >
+    Notification "0..*" -- "1" Actor : destinataire >
+    Publication "1" -- "0..*" AuthoritySource : vérifie >
+    
+    Director "1" -- "0..*" InboxSubject : crée/archives >
+    Citizen "1" -- "0..1" WatcherApp : postule >
+    Director "1" -- "0..*" WatcherApp : approuve/rejette >
+}
+
+' ==========================================
+' COUCHE APPLICATION (ORCHESTRATION)
+' ==========================================
+package "Couche Application (Orchestration)" <<Rectangle>> {
+
+    class "FactCheckingService" as AppService << (S,APP_BG) >> {
+        --
+        **Commandes (Modifie l'état)**
+        - submitReport(citizenId, theme, title, content, media)
+        - pickReport(journalistId, reportId)
+        - submitInvestigationDraft(journalistId, investigationId, data)
+        - submitForReview(journalistId, investigationId)
+        - approveInvestigation(directorId, investigationId)
+        - rejectInvestigation(directorId, investigationId, newStatus)
+        - submitEvidence(watcherId, investigationId, evidence)
+        - applyForWatcher(citizenId)
+        - processWatcherApplication(directorId, applicationId, decision)
+        - manageUserStatus(directorId, targetUserId, action, reason)
+        - manageInboxSubject(directorId, action, subjectData)
+    }
+
+    class "QueryService" as QueryService << (S,APP_BG) >> {
+        --
+        **Requêtes (Consultation)**
+        - getActorProfile(actorId)
+        - getActorHistory(actorId)
+        - getAvailableReports()
+        - getJournalistInvestigations(journalistId)
+        - getPendingInvestigations()
+        - getPublications(filters)
+        - getNotifications(actorId)
+        - getInboxSubjects()
+        - getWatcherApplications()
+        - getDashboard(directorId)
+    }
+
+    class "SecurityService" as SecurityService << (S,SERVICE_BG) >> {
+        --
+        **Méthodes transverses**
+        - authenticate(token): Actor
+        - authorize(actor, action): Boolean
+        - validatePermissions(role, resource): Boolean
+    }
+
+    AppService .right.> SecurityService : utilise >
+    QueryService .right.> SecurityService : utilise >
+}
+
+' ==========================================
+' COUCHE INFRASTRUCTURE
+' ==========================================
+package "Couche Infrastructure (Persistance)" <<Rectangle>> {
+
+    class "ActorRepository" as ActorRepo << (R,INFRA_BG) >> {
+        - save(actor): Actor
+        - findById(id): Actor?
+        - findByEmail(email): Actor?
+        - findByRole(role): Actor[]
+        - updateStatus(id, status, reason): void
+    }
+
+    class "ReportRepository" as ReportRepo << (R,INFRA_BG) >> {
+        - save(report): Report
+        - findById(id): Report?
+        - findByCitizenId(citizenId): Report[]
+        - findAvailable(): Report[]
+        - updateStatus(id, status): void
+    }
+
+    class "InvestigationRepository" as InvestRepo << (R,INFRA_BG) >> {
+        - save(investigation): Investigation
+        - findById(id): Investigation?
+        - findByJournalistId(journalistId): Investigation[]
+        - findByReportId(reportId): Investigation?
+        - findPendingReview(): Investigation[]
+        - updateStatus(id, status): void
+    }
+
+    class "PublicationRepository" as PubRepo << (R,INFRA_BG) >> {
+        - save(publication): Publication
+        - findById(id): Publication?
+        - findByFilters(filters): Publication[]
+        - findByInvestigationId(investigationId): Publication?
+    }
+
+    class "NotificationRepository" as NotifRepo << (R,INFRA_BG) >> {
+        - save(notification): Notification
+        - findByActorId(actorId): Notification[]
+        - markAsRead(id): void
+        - createForPublication(publication): Notification[]
+    }
+}
+
+' --- Liaisons de dépendances ---
+AppService -up-> Actor : utilise >
+AppService -up-> Citizen : utilise >
+AppService -up-> Journalist : utilise >
+AppService -up-> Director : utilise >
+AppService -up-> Report : utilise >
+AppService -up-> Investigation : utilise >
+AppService -up-> Evidence : utilise >
+AppService -up-> Publication : utilise >
+AppService -up-> Notification : utilise >
+AppService -up-> InboxSubject : utilise >
+AppService -up-> WatcherApplication : utilise >
+
+QueryService -up-> Actor : utilise >
+QueryService -up-> Citizen : utilise >
+QueryService -up-> Journalist : utilise >
+QueryService -up-> Director : utilise >
+
+AppService -down-> ActorRepo : utilise >
+AppService -down-> ReportRepo : utilise >
+AppService -down-> InvestRepo : utilise >
+AppService -down-> PubRepo : utilise >
+AppService -down-> NotifRepo : utilise >
+
+QueryService -down-> ActorRepo : utilise >
+QueryService -down-> ReportRepo : utilise >
+QueryService -down-> InvestRepo : utilise >
+QueryService -down-> PubRepo : utilise >
+QueryService -down-> NotifRepo : utilise >
+
+@enduml

@@ -1,0 +1,114 @@
+@startuml
+top to bottom direction
+skinparam actorStyle awesome
+skinparam rectangle {
+  BorderColor #DarkGray
+  BackgroundColor #LightGray
+}
+
+' ==========================================
+' ACTORS
+' ==========================================
+actor "Citizen" as Citizen
+actor "Journalist" as Journalist  
+actor "Director" as Director
+
+' ==========================================
+' SYSTEM
+' ==========================================
+rectangle "Fact-Checking Platform" {
+  
+  ' ---------- AUTHENTICATION ----------
+  (Authenticate) as Auth
+  
+  ' ---------- CITIZEN ----------
+  package "Citizen Features" {
+    (Submit Report) as SubmitReport
+    (View Profile) as ViewProfile
+    (Apply for Watcher) as ApplyWatcher
+    (Submit Evidence) as SubmitEvidence
+    (View Notifications) as ViewNotifications
+    (View Inbox) as ViewInbox
+  }
+  
+  ' ---------- JOURNALIST ----------
+  package "Journalist Features" {
+    (Analyze Report) as AnalyzeReport
+    (Write Investigation) as WriteInvestigation
+    (Submit for Review) as SubmitForReview
+    (Correct Investigation) as CorrectInvestigation
+  }
+  
+  ' ---------- DIRECTOR ----------
+  package "Director Features" {
+    (Validate Investigation) as ValidateInvestigation
+    (Reject Investigation) as RejectInvestigation
+    (Publish Analysis) as PublishAnalysis
+    (Publish Correction) as PublishCorrection
+    (Manage Users) as ManageUsers
+    (Manage Watchers) as ManageWatchers
+    (View Dashboard) as ViewDashboard
+  }
+}
+
+' ==========================================
+' RELATIONS
+' ==========================================
+
+' Required authentication
+SubmitReport ..> Auth : <<include>>
+ViewProfile ..> Auth : <<include>>
+ApplyWatcher ..> Auth : <<include>>
+SubmitEvidence ..> Auth : <<include>>
+ViewNotifications ..> Auth : <<include>>
+ViewInbox ..> Auth : <<include>>
+
+AnalyzeReport ..> Auth : <<include>>
+WriteInvestigation ..> Auth : <<include>>
+SubmitForReview ..> Auth : <<include>>
+CorrectInvestigation ..> Auth : <<include>>
+
+ValidateInvestigation ..> Auth : <<include>>
+RejectInvestigation ..> Auth : <<include>>
+PublishAnalysis ..> Auth : <<include>>
+PublishCorrection ..> Auth : <<include>>
+ManageUsers ..> Auth : <<include>>
+ManageWatchers ..> Auth : <<include>>
+ViewDashboard ..> Auth : <<include>>
+
+' Citizen associations
+Citizen --> SubmitReport
+Citizen --> ViewProfile
+Citizen --> ApplyWatcher
+Citizen --> SubmitEvidence
+Citizen --> ViewNotifications
+Citizen --> ViewInbox
+
+' Journalist associations
+Journalist --> AnalyzeReport
+Journalist --> WriteInvestigation
+Journalist --> SubmitForReview
+Journalist --> CorrectInvestigation
+
+' Director associations
+Director --> ValidateInvestigation
+Director --> RejectInvestigation
+Director --> PublishAnalysis
+Director --> PublishCorrection
+Director --> ManageUsers
+Director --> ManageWatchers
+Director --> ViewDashboard
+
+' Functional dependencies
+AnalyzeReport ..> SubmitReport : <<include>>
+WriteInvestigation ..> AnalyzeReport : <<include>>
+SubmitForReview ..> WriteInvestigation : <<include>>
+CorrectInvestigation ..> SubmitForReview : <<extend>>
+
+ValidateInvestigation ..> SubmitForReview : <<include>>
+RejectInvestigation ..> SubmitForReview : <<extend>>
+PublishAnalysis ..> ValidateInvestigation : <<include>>
+
+SubmitEvidence ..> WriteInvestigation : <<include>>
+
+@enduml

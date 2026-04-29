@@ -1,0 +1,232 @@
+@startuml
+left to right direction
+skinparam theme plain
+skinparam actorStyle awesome
+
+' ==========================================
+' ACTEURS (basés sur les rôles Prisma)
+' ==========================================
+actor "Acteur (CITIZEN)" as Citizen
+actor "Acteur (JOURNALIST)" as Journalist
+actor "Acteur (EDITORIAL_DIRECTOR)" as Director
+
+' ==========================================
+' SYSTÈME
+' ==========================================
+rectangle "Système Fact-Checking" {
+  
+  ' ---------- AUTHENTIFICATION ----------
+  (S'authentifier) as Auth
+  (Se déconnecter) as Logout
+  
+  ' ---------- GESTION DU PROFIL ----------
+  (Consulter son profil) as ViewProfile
+  (Consulter son historique) as ViewHistory
+  (Consulter ses notifications) as ViewNotifications
+  (Marquer notifications comme lues) as MarkNotifsRead
+  
+  ' ---------- CITOYEN (REGULAR) ----------
+  (Soumettre un signalement) as SubmitReport
+  (Consulter les sujets d'inbox) as ViewInboxSubjects
+  (Postuler comme Vigie) as ApplyWatcher
+  (Consulter ses signalements) as ViewOwnReports
+  
+  ' ---------- VIGIE (WATCHER) ----------
+  (Soumettre une preuve) as SubmitEvidence
+  (Consulter les enquêtes en cours) as ViewInvestigationsForEvidence
+  
+  ' ---------- JOURNALISTE ----------
+  (Consulter les signalements disponibles) as ViewAvailableReports
+  (Prendre un signalement) as PickReport
+  (Mettre à jour brouillon enquête) as UpdateInvestigationDraft
+  (Soumettre enquête pour revue) as SubmitForReview
+  (Corriger enquête) as CorrectInvestigation
+  (Consulter ses enquêtes) as ViewOwnInvestigations
+  (Consulter l'inbox disponible) as ViewJournalistInbox
+  
+  ' ---------- DIRECTEUR ----------
+  (Consulter les enquêtes en attente) as ViewPendingInvestigations
+  (Valider une enquête) as ValidateInvestigation
+  (Rejeter une enquête) as RejectInvestigation
+  (Approuver une enquête) as ApproveInvestigation
+  (Marquer comme invérifiable) as MarkUnverifiable
+  (Publier une enquête) as PublishInvestigation
+  
+  ' ---------- GESTION DES UTILISATEURS ----------
+  (Consulter la liste des utilisateurs) as ViewUsers
+  (Bannir un citoyen) as BanCitizen
+  (Désactiver un citoyen) as DisableCitizen
+  (Activer un citoyen) as ActivateCitizen
+  (Bannir un journaliste) as BanJournalist
+  (Désactiver un journaliste) as DisableJournalist
+  (Activer un journaliste) as ActivateJournalist
+  
+  ' ---------- GESTION DES VIGIES ----------
+  (Consulter les candidatures vigie) as ViewWatcherApplications
+  (Approuver candidature vigie) as ApproveWatcherApplication
+  (Rejeter candidature vigie) as RejectWatcherApplication
+  
+  ' ---------- GESTION INBOX ----------
+  (Créer un sujet d'inbox) as CreateInboxSubject
+  (Archiver un sujet d'inbox) as ArchiveInboxSubject
+  (Consulter le dashboard) as ViewDashboard
+  
+  ' ---------- PUBLICATIONS ----------
+  (Consulter les publications) as ViewPublications
+  (Créer une correction) as CreateCorrection
+  (Consulter les sources d'autorité) as ViewAuthoritySources
+}
+
+' ==========================================
+' RELATIONS D'HÉRITAGE (basées sur les rôles)
+' ==========================================
+Citizen : "role = CITIZEN\n(Regular ou Watcher)"
+Journalist : "role = JOURNALIST"
+Director : "role = EDITORIAL_DIRECTOR"
+
+' ==========================================
+' AUTHENTIFICATION OBLIGATOIRE
+' ==========================================
+SubmitReport ..> Auth : <<include>>
+ViewProfile ..> Auth : <<include>>
+ViewHistory ..> Auth : <<include>>
+ViewNotifications ..> Auth : <<include>>
+MarkNotifsRead ..> Auth : <<include>>
+ViewInboxSubjects ..> Auth : <<include>>
+ApplyWatcher ..> Auth : <<include>>
+ViewOwnReports ..> Auth : <<include>>
+
+SubmitEvidence ..> Auth : <<include>>
+ViewInvestigationsForEvidence ..> Auth : <<include>>
+
+ViewAvailableReports ..> Auth : <<include>>
+PickReport ..> Auth : <<include>>
+UpdateInvestigationDraft ..> Auth : <<include>>
+SubmitForReview ..> Auth : <<include>>
+CorrectInvestigation ..> Auth : <<include>>
+ViewOwnInvestigations ..> Auth : <<include>>
+ViewJournalistInbox ..> Auth : <<include>>
+
+ViewPendingInvestigations ..> Auth : <<include>>
+ValidateInvestigation ..> Auth : <<include>>
+RejectInvestigation ..> Auth : <<include>>
+ApproveInvestigation ..> Auth : <<include>>
+MarkUnverifiable ..> Auth : <<include>>
+PublishInvestigation ..> Auth : <<include>>
+
+ViewUsers ..> Auth : <<include>>
+BanCitizen ..> Auth : <<include>>
+DisableCitizen ..> Auth : <<include>>
+ActivateCitizen ..> Auth : <<include>>
+BanJournalist ..> Auth : <<include>>
+DisableJournalist ..> Auth : <<include>>
+ActivateJournalist ..> Auth : <<include>>
+
+ViewWatcherApplications ..> Auth : <<include>>
+ApproveWatcherApplication ..> Auth : <<include>>
+RejectWatcherApplication ..> Auth : <<include>>
+
+CreateInboxSubject ..> Auth : <<include>>
+ArchiveInboxSubject ..> Auth : <<include>>
+ViewDashboard ..> Auth : <<include>>
+
+ViewPublications ..> Auth : <<include>>
+CreateCorrection ..> Auth : <<include>>
+ViewAuthoritySources ..> Auth : <<include>>
+
+' ==========================================
+' ASSOCIATIONS - CITOYEN
+' ==========================================
+Citizen --> SubmitReport
+Citizen --> ViewProfile
+Citizen --> ViewHistory
+Citizen --> ViewNotifications
+Citizen --> MarkNotifsRead
+Citizen --> ViewInboxSubjects
+Citizen --> ApplyWatcher
+Citizen --> ViewOwnReports
+Citizen --> ViewPublications
+
+' ==========================================
+' ASSOCIATIONS - VIGIE (extension citoyen)
+' ==========================================
+Citizen --> SubmitEvidence
+Citizen --> ViewInvestigationsForEvidence
+
+' ==========================================
+' ASSOCIATIONS - JOURNALISTE
+' ==========================================
+Journalist --> ViewAvailableReports
+Journalist --> PickReport
+Journalist --> UpdateInvestigationDraft
+Journalist --> SubmitForReview
+Journalist --> CorrectInvestigation
+Journalist --> ViewOwnInvestigations
+Journalist --> ViewJournalistInbox
+Journalist --> ViewProfile
+Journalist --> ViewHistory
+Journalist --> ViewNotifications
+Journalist --> MarkNotifsRead
+Journalist --> ViewPublications
+
+' ==========================================
+' ASSOCIATIONS - DIRECTEUR
+' ==========================================
+Director --> ViewPendingInvestigations
+Director --> ValidateInvestigation
+Director --> RejectInvestigation
+Director --> ApproveInvestigation
+Director --> MarkUnverifiable
+Director --> PublishInvestigation
+Director --> ViewUsers
+Director --> BanCitizen
+Director --> DisableCitizen
+Director --> ActivateCitizen
+Director --> BanJournalist
+Director --> DisableJournalist
+Director --> ActivateJournalist
+Director --> ViewWatcherApplications
+Director --> ApproveWatcherApplication
+Director --> RejectWatcherApplication
+Director --> CreateInboxSubject
+Director --> ArchiveInboxSubject
+Director --> ViewDashboard
+Director --> ViewProfile
+Director --> ViewHistory
+Director --> ViewNotifications
+Director --> MarkNotifsRead
+Director --> ViewPublications
+Director --> CreateCorrection
+Director --> ViewAuthoritySources
+
+' ==========================================
+' DÉPENDANCES FONCTIONNELLES
+' ==========================================
+PickReport ..> ViewAvailableReports : <<include>>
+UpdateInvestigationDraft ..> PickReport : <<include>>
+SubmitForReview ..> UpdateInvestigationDraft : <<include>>
+CorrectInvestigation ..> SubmitForReview : <<include>>
+
+SubmitEvidence ..> ViewInvestigationsForEvidence : <<include>>
+
+ApproveInvestigation ..> ValidateInvestigation : <<extend>>
+RejectInvestigation ..> ValidateInvestigation : <<extend>>
+MarkUnverifiable ..> ValidateInvestigation : <<extend>>
+
+PublishInvestigation ..> ApproveInvestigation : <<include>>
+
+ApproveWatcherApplication ..> ViewWatcherApplications : <<include>>
+RejectWatcherApplication ..> ViewWatcherApplications : <<include>>
+
+ArchiveInboxSubject ..> CreateInboxSubject : <<include>>
+
+CreateCorrection ..> ViewPublications : <<include>>
+
+' ==========================================
+' EXTENSIONS DE RÔLE
+' ==========================================
+note right of Citizen : "Le citoyen peut devenir Vigie\naprès approbation de sa candidature"
+note right of Journalist : "Le journaliste peut gérer\nune seule enquête active à la fois"
+note right of Director : "Le directeur a tous les droits\nde modération et publication"
+
+@enduml

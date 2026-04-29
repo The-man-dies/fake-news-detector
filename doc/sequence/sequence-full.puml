@@ -1,0 +1,206 @@
+@startuml
+autonumber
+skinparam theme plain
+skinparam participantBackgroundColor #FEFEFE
+skinparam participantBorderColor #333333
+skinparam sequenceArrowColor #555555
+skinparam sequenceLifeLineBorderColor #555555
+
+' ==========================================
+' ACTEURS ET PARTICIPANTS
+' ==========================================
+actor "Citoyen (Watcher)" as Watcher
+participant "API Service" as API
+database "PostgreSQL (Prisma)" as DB
+actor "Journaliste" as Journalist
+actor "Directeur" as Director
+
+' ==========================================
+' PHASE 1 : SOUMISSION SIGNALEMENT PAR CITOYEN
+' ==========================================
+== Phase 1 : Soumission signalement ==
+Watcher -> API : POST /reports
+activate API
+
+API -> API : authenticateToken()
+note right of API : Vérification JWT\nrole = CITIZEN
+
+API -> DB : INSERT INTO reports (citizen_id, theme, title, content, status)
+activate DB
+DB --> API : Report créé (id généré)
+deactivate DB
+
+API --> Watcher : 201 Created (report_id)
+deactivate API
+
+' ==========================================
+' PHASE 2 : PRISE EN CHARGE PAR JOURNALISTE
+' ==========================================
+== Phase 2 : Prise en charge par Journaliste ==
+Journalist -> API : POST /investigations
+activate API
+
+API -> API : authenticateToken()
+note right of API : Vérification JWT\nrole = JOURNALIST
+
+API -> DB : SELECT * FROM reports WHERE status = 'OPEN' AND id = ?
+activate DB
+DB --> API : Report disponible
+deactivate DB
+
+API -> DB : INSERT INTO investigations (report_id, journalist_id, status, attempt_count)
+activate DB
+DB --> API : Investigation créée
+deactivate DB
+
+API -> DB : UPDATE reports SET status = 'IN_PROGRESS' WHERE id = ?
+activate DB
+DB --> API : Report mis à jour
+deactivate DB
+
+API --> Journalist : 201 Created (investigation_id)
+deactivate API
+
+' ==========================================
+' PHASE 3 : SOUMISSION PREUVE PAR VIGIE
+' ==========================================
+== Phase 3 : Soumission preuve par Vigie ==
+Watcher -> API : POST /evidence
+activate API
+
+API -> API : authenticateToken()
+note right of API : Vérification JWT\nrole = CITIZEN\ncitizenType = WATCHER
+
+API -> DB : SELECT * FROM actors WHERE id = ? AND citizen_type = 'WATCHER'
+activate DB
+DB --> API : Vigie confirmé
+deactivate DB
+
+API -> DB : INSERT INTO evidence (content, title, investigation_id, watcher_id)
+activate DB
+DB --> API : Evidence créée
+deactivate DB
+
+API --> Watcher : 201 Created (evidence_id)
+deactivate API
+
+' ==========================================
+' PHASE 4 : CONSULTATION EVIDENCES PAR JOURNALISTE
+' ==========================================
+== Phase 4 : Consultation evidences ==
+Journalist -> API : GET /investigations/{id}/evidence
+activate API
+
+API -> API : authenticateToken()
+API -> DB : SELECT * FROM evidence WHERE investigation_id = ?
+activate DB
+DB --> API : Liste des evidences
+deactivate DB
+
+API --> Journalist : 200 OK (evidences)
+deactivate API
+
+' ==========================================
+' PHASE 5 : SOUMISSION ENQUETE POUR REVUE
+' ==========================================
+== Phase 5 : Soumission enquête ==
+Journalist -> API : PATCH /investigations/{id}
+activate API
+
+API -> API : authenticateToken()
+API -> DB : UPDATE investigations SET media_category = ?, draft_verdict = ?, investigation_notes = ?, status = 'PENDING_REVIEW'
+activate DB
+DB --> API : Investigation mise à jour
+deactivate DB
+
+API --> Journalist : 200 OK
+deactivate API
+
+' ==========================================
+' PHASE 6 : VALIDATION PAR DIRECTEUR
+' ==========================================
+== Phase 6 : Validation par Directeur ==
+Director -> API : POST /investigations/{id}/approve
+activate API
+
+API -> API : authenticateToken()
+note right of API : Vérification JWT\nrole = EDITORIAL_DIRECTOR
+
+API -> DB : UPDATE investigations SET status = 'PUBLISHED'
+activate DB
+DB --> API : Investigation approuvée
+deactivate DB
+
+API -> DB : INSERT INTO publications (investigation_id, approved_by_id, final_verdict, published_at)
+activate DB
+DB --> API : Publication créée
+deactivate DB
+
+API -> DB : INSERT INTO notifications (actor_id, type, theme, message, publication_id)
+activate DB
+note right of DB : Notifications batch pour\nles acteurs concernés
+DB --> API : Notifications créées
+deactivate DB
+
+API --> Director : 201 Created (publication_id)
+deactivate API
+
+' ==========================================
+' PHASE 7 : NOTIFICATION ACTEURS
+' ==========================================
+== Phase 7 : Notification des acteurs ==
+Watcher -> API : GET /notifications
+activate API
+
+API -> API : authenticateToken()
+API -> DB : SELECT * FROM notifications WHERE actor_id = ? AND is_active = true
+activate DB
+DB --> API : Notifications non lues
+deactivate DB
+
+API --> Watcher : 200 OK (notifications)
+deactivate API
+
+' ==========================================
+' PHASE 8 : POSTULATION VIGIE
+' ==========================================
+== Phase 8 : Postulation Vigie ==
+Watcher -> API : POST /watcher-applications
+activate API
+
+API -> API : authenticateToken()
+API -> DB : SELECT * FROM actors WHERE id = ? AND citizen_type = 'REGULAR'
+activate DB
+DB --> API : Citoyen régulier confirmé
+deactivate DB
+
+API -> DB : INSERT INTO watcher_applications (applicant_id, status)
+activate DB
+DB --> API : Candidature créée
+deactivate DB
+
+API --> Watcher : 201 Created
+deactivate API
+
+' ==========================================
+' PHASE 9 : APPROBATION VIGIE PAR DIRECTEUR
+' ==========================================
+== Phase 9 : Approbation Vigie ==
+Director -> API : PATCH /watcher-applications/{id}/approve
+activate API
+
+API -> API : authenticateToken()
+API -> DB : UPDATE watcher_applications SET status = 'APPROVED'
+activate DB
+DB --> API : Candidature approuvée
+deactivate DB
+
+API -> DB : UPDATE actors SET citizen_type = 'WATCHER' WHERE id = ?
+activate DB
+DB --> API : Citoyen promu Vigie
+deactivate DB
+
+API --> Director : 200 OK
+deactivate API
+
+@enduml
