@@ -1,4 +1,4 @@
-import http from 'http'
+import https from 'https'
 
 // ==========================================
 // SYSTEM PROMPTS FOR ALL AGENTS
@@ -161,13 +161,13 @@ export async function runAgent(type, inputs) {
 
   const fullPrompt = `${systemPrompt}\n\n---USER INPUT---\n${userPrompt}`
   const promptLength = fullPrompt.length
-  console.log(`     Prompt size: ${promptLength} chars (truncated to 50000)`)
+  console.log(`     Prompt size: ${promptLength} chars (truncated to 60000)`)
 
   try {
-    const promptArg = fullPrompt.substring(0, 50000)
-    console.log(`     Calling Ollama API...`)
+    const promptArg = fullPrompt.substring(0, 60000)
+    console.log(`     Calling Groq API...`)
 
-    const response = await ollamaGenerate(promptArg)
+    const response = await groqGenerate(promptArg)
 
     console.log(`     ✅ ${type} agent completed (output: ${response.length} chars)`)
     return parseAgentOutput(response, type)
@@ -178,26 +178,37 @@ export async function runAgent(type, inputs) {
   }
 }
 
-function ollamaGenerate(prompt) {
+function groqGenerate(prompt) {
   return new Promise((resolve, reject) => {
+    const apiKey = process.env.GROQ_API_KEY
+    if (!apiKey) {
+      reject(new Error('GROQ_API_KEY not set in environment'))
+      return
+    }
+
     const data = JSON.stringify({
-      model: 'qwen2.5-coder:3b',
-      prompt: prompt,
-      stream: false
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: 'You are a DDD expert analyzing code changes. Always respond with valid JSON only.' },
+        { role: 'user', content: prompt }
+      ],
+      temperature: 0.3,
+      max_tokens: 4096
     })
 
     const options = {
-      hostname: 'localhost',
-      port: 11434,
-      path: '/api/generate',
+      hostname: 'api.groq.com',
+      port: 443,
+      path: '/openai/v1/chat/completions',
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'Content-Length': data.length
       }
     }
 
-    const req = http.request(options, (res) => {
+    const req = https.request(options, (res) => {
       let body = ''
       res.on('data', (chunk) => { body += chunk })
       res.on('end', () => {
@@ -206,7 +217,7 @@ function ollamaGenerate(prompt) {
         } else {
           try {
             const json = JSON.parse(body)
-            resolve(json.response || '')
+            resolve(json.choices?.[0]?.message?.content || '')
           } catch (e) {
             reject(new Error(`Invalid JSON response: ${e.message}`))
           }
@@ -215,7 +226,7 @@ function ollamaGenerate(prompt) {
     })
 
     req.on('error', (err) => reject(err))
-    req.setTimeout(300000, () => {
+    req.setTimeout(120000, () => {
       req.destroy()
       reject(new Error('Request timeout'))
     })
