@@ -154,26 +154,40 @@ Follow the provided TEMPLATE exactly, replacing X/10 with actual scores and fill
 // ==========================================
 
 export async function runAgent(type, inputs) {
+  console.log(`  🤖 Starting ${type} agent...`)
+  
   const systemPrompt = SYSTEM_PROMPTS[type]
   const userPrompt = buildUserPrompt(type, inputs)
   
   const fullPrompt = `${systemPrompt}\n\n---USER INPUT---\n${userPrompt}`
+  const promptLength = fullPrompt.length
+  console.log(`     Prompt size: ${promptLength} chars (truncated to 8000)`)
   
   try {
     const promptArg = fullPrompt.substring(0, 8000)
-    const { stdout, stderr, status } = spawnSync(
+    console.log(`     Calling Ollama...`)
+    
+    const { stdout, stderr, status, error } = spawnSync(
       'ollama',
       ['run', 'qwen2.5-coder:3b', promptArg],
-      { timeout: 120000, encoding: 'utf-8', maxBuffer: 1024 * 1024 }
+      { timeout: 300000, encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 }
     )
 
-    if (status !== 0) {
-      throw new Error(stderr || 'Ollama execution failed')
+    if (error) {
+      console.error(`     ❌ Spawn error for ${type}:`, error.message)
+      throw error
     }
 
-    return parseAgentOutput(stdout)
+    if (status !== 0) {
+      console.error(`     ❌ Ollama exited with status ${status}:`, stderr)
+      throw new Error(stderr || `Ollama execution failed with status ${status}`)
+    }
+
+    console.log(`     ✅ ${type} agent completed (output: ${stdout.length} chars)`)
+    return parseAgentOutput(stdout, type)
   } catch (error) {
-    console.error(`Agent ${type} failed:`, error.message)
+    console.error(`     ⚠️ Agent ${type} failed:`, error.message)
+    console.log(`     🔄 Using default response for ${type}`)
     return getDefaultResponse(type)
   }
 }
@@ -245,17 +259,20 @@ Generate the final report following the template.`
   }
 }
 
-function parseAgentOutput(output) {
+function parseAgentOutput(output, type = 'unknown') {
   try {
     // Try to extract JSON from the output (handle markdown code blocks)
     const jsonMatch = output.match(/```json\n?([\s\S]*?)\n?```/) || 
                       output.match(/{[\s\S]*}/)
     
     const jsonStr = jsonMatch ? jsonMatch[1] || jsonMatch[0] : output
-    return JSON.parse(jsonStr.trim())
+    const result = JSON.parse(jsonStr.trim())
+    console.log(`     ✅ ${type} output parsed successfully`)
+    return result
   } catch (e) {
-    console.error('Failed to parse agent output:', e)
-    return { score: 5, issues: [], summary: 'Parse error' }
+    console.error(`     ⚠️ Failed to parse ${type} agent output:`, e.message)
+    console.log(`     📄 Raw output (first 200 chars): ${output.substring(0, 200)}...`)
+    return { score: 5, issues: [], summary: 'Parse error - using defaults' }
   }
 }
 
