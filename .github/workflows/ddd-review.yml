@@ -1,0 +1,53 @@
+name: DDD Multi-Agent Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ddd-review:
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Run DDD Review System
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: node .github/scripts/run-agents.js
+
+      - name: Report DDD status
+        run: |
+          STATUS=$(cat result.json | jq -r '.status')
+          if [ "$STATUS" = "FAIL" ]; then
+            echo "DDD review reported blocking issues"
+          else
+            echo "DDD review passed"
+          fi
+
+      - name: Comment PR
+        if: always()
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('review.md', 'utf8');
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
