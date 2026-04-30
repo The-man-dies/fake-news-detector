@@ -67,7 +67,7 @@ export class Director {
 
   markAsArchived(investigation: Investigation): void {
     if (!this.isActive()) {
-      throw new Error('Director account is not active')
+      throw new BusinessRuleError('Director account is not active')
     }
     investigation.markAsArchived()
   }

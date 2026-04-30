@@ -2,6 +2,12 @@
 import { Notification, NotificationType } from '../entities/Notification'
 import { randomUUID } from 'crypto'
 
+export const NOTIFICATION_THEME = {
+  INVESTIGATION_REVIEW: 'Investigation review result',
+  INVESTIGATION_FINAL_VERDICT: 'Final investigation verdict',
+  PUBLICATION: 'Publication',
+} as const
+
 export interface CreateNotificationParams {
   type?: NotificationType
   theme: string
@@ -42,13 +48,13 @@ export class NotificationFactory {
 
   static createInvestigationNotification(
     journalistId: string,
-    investigationId: string,
-    status: string,
+    theme: string,
+    message: string,
   ): Notification {
     return this.create({
       type: 'ALERT',
-      theme: 'Resultat de la revue de l\'enquête',
-      message: `Votre enquête ${investigationId} a été ${status}`,
+      theme,
+      message,
       actorId: journalistId,
     })
   }
@@ -70,14 +76,14 @@ export class NotificationFactory {
 
   static createPublicationForJournalist(
     journalistId: string,
-    investigationId: string,
-    verdict: string,
+    theme: string,
+    message: string,
     publicationId: string,
   ): Notification {
     return this.create({
       type: 'PUBLICATION',
-      theme: 'Verdict final de l\'enquête',
-      message: `Votre enquête ${investigationId} a reçu le verdict final: ${verdict}`,
+      theme,
+      message,
       actorId: journalistId,
       publicationId,
     })

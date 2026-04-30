@@ -175,7 +175,7 @@ export class Journalist {
     return {
       id: this.id,
       name: this.name,
-      emai: this.email,
+      email: this.email,
       lastInboxRead: this.lastInboxRead,
       role: this.role,
       activeInvestigations: this.activeInvestigationsCount,

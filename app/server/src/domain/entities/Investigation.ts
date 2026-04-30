@@ -114,7 +114,9 @@ export class Investigation {
   // Mark as archived
   markAsArchived(): void {
     if (!this.canMarkAsArchived()) {
-      throw new BusinessRuleError('Investigation draft verdict must be UNVERIFIABLE or here status must be NEED_REVISION');
+      throw new BusinessRuleError(
+        'Investigation draft verdict must be UNVERIFIABLE and its status must be NEEDS_REVISION',
+      )
     }
     this.status = 'ARCHIVED'
     this.updatedAt = new Date()
