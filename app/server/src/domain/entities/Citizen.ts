@@ -3,31 +3,31 @@
 
 import { Report } from './Report'
 import { Evidence } from './Evidence'
+import { MAX_REPORTING_PER_CITIZEN_AT_A_TIME } from '../../shared'
 import { DomainError } from '../../shared/errors'
 import { BusinessRuleError } from '../../shared/errors'
+import type { StatusReason, ActorStatus, ActorRole } from '../../shared/types'
 
-export type CitizenStatus = 'ACTIVE' | 'DISABLED' | 'BANNED'
 export type CitizenType = 'REGULAR' | 'WATCHER'
-export type StatusReason =
-  | 'SPAM'
-  | 'ABUSE'
-  | 'FRAUD'
-  | 'INACTIVITY'
-  | 'USER_REQUEST'
-  | 'OTHER'
+export type CitizenRole = ActorRole
+export type CitizenStatus = ActorStatus
+export type CitizenStatusReason = StatusReason
+
+
 
 export class Citizen {
   constructor(
     public readonly id: string,
     public name: string,
     public email: string,
+    public role: CitizenRole = 'CITIZEN',
     public status: CitizenStatus = 'ACTIVE',
     public citizenType: CitizenType = 'REGULAR',
     public engagementScore: number = 0,
     public lastInboxRead: Date = new Date(),
     public openReportsCount: number = 0,
-    public readonly maxOpenReports: number = 3,
-    public statusReason: StatusReason | null = null,
+    public readonly maxOpenReports: number = MAX_REPORTING_PER_CITIZEN_AT_A_TIME,
+    public statusReason: CitizenStatusReason | null = null,
     public statusReasonDetails: string | null = null,
     public readonly createdAt: Date = new Date(),
     public updatedAt: Date = new Date(),
@@ -105,19 +105,9 @@ export class Citizen {
     )
   }
 
-  applyForWatcher(): void {
-    if (!this.canApplyForWatcher()) {
-      throw new BusinessRuleError(
-        'Cannot apply for watcher: must be active regular citizen',
-      )
-    }
-    // WatcherApplication creation handled by application service
-    this.updatedAt = new Date()
-  }
-
   promoteToWatcher(): void {
-    if (this.citizenType === 'WATCHER') {
-      throw new DomainError('Already a watcher')
+    if (this.citizenType === 'WATCHER' || !this.canApplyForWatcher()) {
+      throw new DomainError('Cannot promote: already a watcher or cannot apply')
     }
     this.citizenType = 'WATCHER'
     this.updatedAt = new Date()
@@ -181,6 +171,7 @@ export class Citizen {
       status: this.status,
       citizenType: this.citizenType,
       openReportsCount: this.openReportsCount,
+      lastInboxRead: this.lastInboxRead,
     }
   }
 }

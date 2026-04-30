@@ -3,16 +3,14 @@
 
 import { Investigation, InvestigationStatus } from './Investigation'
 import { InboxSubject } from './InboxSubject'
-import { Citizen, StatusReason as CitizenStatusReason } from './Citizen'
-import {
-  Journalist,
-  StatusReason as JournalistStatusReason,
-} from './Journalist'
+import { Citizen, CitizenStatusReason } from './Citizen'
+import { Journalist, JournalistStatusReason } from './Journalist'
 import { WatcherApplication } from './WatcherApplication'
-import { DomainError } from '../../shared/errors'
-import { BusinessRuleError } from '../../shared/errors'
+import { DomainError, BusinessRuleError } from '../../shared/errors'
+import { ActorStatus, ActorRole } from '../../shared/types'
 
-export type DirectorStatus = 'ACTIVE' | 'DISABLED'
+export type DirectorStatus = ActorStatus
+export type DirectorRole = ActorRole
 
 export class Director {
   constructor(
@@ -20,7 +18,9 @@ export class Director {
     public name: string,
     public email: string,
     public status: DirectorStatus = 'ACTIVE',
+    public role: DirectorRole = 'EDITORIAL_DIRECTOR',
     public lastInboxRead: Date = new Date(),
+    public scoreInvestigation: number = 0,
     public readonly createdAt: Date = new Date(),
     public updatedAt: Date = new Date(),
   ) {}
@@ -28,6 +28,11 @@ export class Director {
   // Status checks
   isActive(): boolean {
     return this.status === 'ACTIVE'
+  }
+
+  // Incremente score of investigation
+  incrementScoreInvestigation(point: number = 1): void {
+    this.scoreInvestigation += point
   }
 
   // Investigation validation
@@ -56,14 +61,15 @@ export class Director {
     if (!this.isActive()) {
       throw new BusinessRuleError('Director account is not active')
     }
+    this.incrementScoreInvestigation()
     investigation.approve()
   }
 
-  markAsUnverifiable(investigation: Investigation): void {
+  markAsArchived(investigation: Investigation): void {
     if (!this.isActive()) {
       throw new Error('Director account is not active')
     }
-    investigation.markAsUnverifiable()
+    investigation.markAsArchived()
   }
 
   // Watcher applications
@@ -145,6 +151,7 @@ export class Director {
     if (!this.isActive()) {
       throw new BusinessRuleError('Director account is not active')
     }
+    this.incrementScoreInvestigation()
     this.updatedAt = new Date()
     return new InboxSubject(
       crypto.randomUUID(),
@@ -160,6 +167,7 @@ export class Director {
     if (!this.isActive()) {
       throw new BusinessRuleError('Director account is not active')
     }
+    this.incrementScoreInvestigation()
     subject.archive()
     this.updatedAt = new Date()
   }

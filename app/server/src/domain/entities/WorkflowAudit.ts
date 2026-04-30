@@ -14,7 +14,7 @@ export class WorkflowAudit {
   ) {}
 
   isRejection(): boolean {
-    return this.newStatus === 'NEEDS_REVISION' || this.newStatus === 'UNVERIFIABLE'
+    return this.newStatus === 'NEEDS_REVISION'
   }
 
   isApproval(): boolean {

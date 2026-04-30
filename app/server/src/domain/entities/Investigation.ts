@@ -17,7 +17,7 @@ export type InvestigationStatus =
   | 'PENDING_REVIEW'
   | 'NEEDS_REVISION'
   | 'PUBLISHED'
-  | 'UNVERIFIABLE'
+  | 'ARCHIVED'
 
 export class Investigation {
   constructor(
@@ -53,6 +53,10 @@ export class Investigation {
     )
   }
 
+  canMarkAsArchived(): boolean {
+    return this.draftVerdict === 'UNVERIFIABLE' && this.status === 'NEEDS_REVISION'
+  }
+
   // Journalist actions
   updateDraft(
     mediaCategory: MediaCategory | null,
@@ -85,7 +89,7 @@ export class Investigation {
 
   // Director rejection
   requestRevision(newStatus: InvestigationStatus): void {
-    if (newStatus !== 'NEEDS_REVISION' && newStatus !== 'UNVERIFIABLE') {
+    if (newStatus !== 'NEEDS_REVISION') {
       throw new BusinessRuleError('Invalid status for rejection')
     }
     if (this.attemptCount >= MAX_REVISION_ATTEMPTS) {
@@ -107,9 +111,12 @@ export class Investigation {
     this.updatedAt = new Date()
   }
 
-  // Mark as unverifiable
-  markAsUnverifiable(): void {
-    this.status = 'UNVERIFIABLE'
+  // Mark as archived
+  markAsArchived(): void {
+    if (!this.canMarkAsArchived()) {
+      throw new BusinessRuleError('Investigation draft verdict must be UNVERIFIABLE or here status must be NEED_REVISION');
+    }
+    this.status = 'ARCHIVED'
     this.updatedAt = new Date()
   }
 }

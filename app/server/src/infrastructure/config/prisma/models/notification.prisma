@@ -9,7 +9,7 @@ model Notification {
   theme   String
   message String @db.Text
 
-  isActive Boolean @default(true)
+  isRead Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

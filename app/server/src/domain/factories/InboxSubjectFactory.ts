@@ -3,9 +3,7 @@ import {
   type InboxSubjectOrigin,
   type InboxSubjectStatus,
 } from "../entities/InboxSubject"
-import { Report } from '../entities/Report'
 import { randomUUID } from 'crypto'
-import { DomainError } from "../../shared"
 
 type CreateInboxSubjectParams = {
   theme: string
@@ -45,7 +43,15 @@ export class InboxSubjectFactory {
     })
   }
 
-  static createFromExistingReport(report: Report): InboxSubject {
-    throw new DomainError('Not implemented')
+  static createFromExistingReport(citizenId: string, theme: string, description: string): InboxSubject {
+    return this.create({
+      theme,
+      description,
+      createdById: citizenId,
+      status: 'OPEN',
+      origin: 'REPORT',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
   }
 }

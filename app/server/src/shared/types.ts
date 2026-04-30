@@ -12,3 +12,14 @@ export interface PaginatedResult<T> {
   page: number
   pageSize: number
 }
+
+export type StatusReason =
+  | 'SPAM'
+  | 'ABUSE'
+  | 'FRAUD'
+  | 'INACTIVITY'
+  | 'USER_REQUEST'
+  | 'OTHER'
+
+export type ActorStatus = 'ACTIVE' | 'DISABLED' | 'BANNED'
+export type ActorRole = 'EDITORIAL_DIRECTOR' | 'JOURNALIST' | 'CITIZEN'
