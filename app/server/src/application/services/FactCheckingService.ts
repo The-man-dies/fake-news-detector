@@ -113,11 +113,13 @@ export class FactCheckingService {
     message: string,
     publicationId?: string,
   ): Promise<void> {
-    const notification = NotificationFactory.create(
-      citizenId,
+    const notification = NotificationFactory.create({
+      type: publicationId ? 'PUBLICATION' : 'ALERT',
+      theme: publicationId ? 'Publication' : 'Alerte',
       message,
+      actorId: citizenId,
       publicationId,
-    )
+    })
     await this.notificationRepository.save(notification)
   }
 

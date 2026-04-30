@@ -4,6 +4,7 @@
 
 model Investigation {
   id String @id @default(uuid())
+  status InvestigationStatus @default(OPEN)
 
   reportId String @unique
   report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
@@ -74,8 +75,8 @@ model WorkflowAudit {
   actorId String
   actor   Actor  @relation("WorkflowAuditAuthor", fields: [actorId], references: [id])
 
-  previousStatus ReportStatus?
-  newStatus      ReportStatus
+  previousStatus InvestigationStatus?
+  newStatus      InvestigationStatus
 
   comment String? @db.Text
 

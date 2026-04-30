@@ -1,0 +1,14 @@
+Une notification a un type en fonction de son type plusieurs regles metier decoule
+- Une notification de type publication implique une information des citoyen et du journaliste associer a l'affaire 
+sur le verdict final du directeur de publication
+- Une notification de type correction implique que la notification a pour but  de corriger un verdict erroner
+- Une notification de type alert a pour but d'informer le directeur de publication, journaliste watcher d'autre evenement divers
+ NB: la couche domaine lier a la notification devra etre mise a jour
+
+Une investigation peut contenir les fichiers ou documents lier a un signalement citoyen dans la table investigationMedia
+via le champ InvestigationOrigin, l'application devra lire les media du report les stocker dans la table investigationMedia et basculer
+l'origin a 'CITIZEN_REPORT' ainsi le journaliste poura attester de sa fiabilite et la categoriser mais si l'origine du media est definit sur
+'JOURNALIST_PROOF' alors les champ de fiabilite et de category ne sont pas applicable conformement a la parole de l'expert journaliste
+je fais confiance a mes journaliste fin de citation. Cependant l'application exigera une source de l'autorite derire ce media
+
+- Cheker Que OnPick report passe bien le status du report a 'IN_PROGRESS'

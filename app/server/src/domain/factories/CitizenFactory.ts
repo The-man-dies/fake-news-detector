@@ -1,10 +1,11 @@
 // domain/factories/CitizenFactory.ts
-import { Citizen, CitizenStatus, CitizenType } from '../entities/Citizen'
+import { Citizen, CitizenType, CitizenStatus, CitizenRole } from '../entities/Citizen'
 import { randomUUID } from 'crypto'
 
 export interface CreateCitizenParams {
   name: string
   email: string
+  role?: CitizenRole
   status?: CitizenStatus
   citizenType?: CitizenType
   engagementScore?: number
@@ -18,6 +19,7 @@ export class CitizenFactory {
       id,
       params.name,
       params.email,
+      params.role,
       params.status || 'ACTIVE',
       params.citizenType || 'REGULAR',
       params.engagementScore || 0,
@@ -48,3 +50,4 @@ export class CitizenFactory {
     })
   }
 }
+

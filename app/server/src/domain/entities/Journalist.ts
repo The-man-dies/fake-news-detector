@@ -4,28 +4,25 @@
 import { Investigation, MediaCategory, Verdict } from './Investigation'
 import { Report } from './Report'
 import { BusinessRuleError, DomainError } from '../../shared/errors'
-import { MAX_CORRECTION_ATTEMPTS } from '../../shared'
+import { MAX_CORRECTION_ATTEMPTS, MAX_INVESTIGATIONS_PER_JOURNALIST_AT_A_TIME } from '../../shared'
+import { StatusReason, ActorStatus, ActorRole } from '../../shared/types'
 
-export type JournalistStatus = 'ACTIVE' | 'DISABLED' | 'BANNED'
-export type StatusReason =
-  | 'SPAM'
-  | 'ABUSE'
-  | 'FRAUD'
-  | 'INACTIVITY'
-  | 'USER_REQUEST'
-  | 'OTHER'
+export type JournalistRole = ActorRole
+export type JournalistStatus = ActorStatus
+export type JournalistStatusReason = StatusReason
 
 export class Journalist {
   constructor(
     public readonly id: string,
     public name: string,
     public email: string,
+    public role: JournalistRole = 'JOURNALIST',
     public status: JournalistStatus = 'ACTIVE',
     public engagementScore: number = 0,
     public lastInboxRead: Date = new Date(),
     public activeInvestigationsCount: number = 0,
-    public readonly maxActiveInvestigations: number = 1,
-    public statusReason: StatusReason | null = null,
+    public readonly maxActiveInvestigations: number = MAX_INVESTIGATIONS_PER_JOURNALIST_AT_A_TIME,
+    public statusReason: JournalistStatusReason | null = null,
     public statusReasonDetails: string | null = null,
     public readonly createdAt: Date = new Date(),
     public updatedAt: Date = new Date(),
@@ -124,7 +121,7 @@ export class Journalist {
     if (
       investigation.journalistId === this.id &&
       this.activeInvestigationsCount > 0 &&
-      investigation.status === 'PUBLISHED'
+      (investigation.status === 'PUBLISHED' || investigation.status === 'ARCHIVED')
     ) {
       this.activeInvestigationsCount--
       this.incrementEngagementScore(2)
@@ -174,10 +171,13 @@ export class Journalist {
   }
 
   // Getters
-  getHistory() {
+  getProfile() {
     return {
       id: this.id,
       name: this.name,
+      email: this.email,
+      lastInboxRead: this.lastInboxRead,
+      role: this.role,
       activeInvestigations: this.activeInvestigationsCount,
       engagementScore: this.engagementScore,
     }

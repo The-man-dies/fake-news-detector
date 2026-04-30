@@ -1,10 +1,11 @@
 // domain/factories/JournalistFactory.ts
-import { Journalist, JournalistStatus } from '../entities/Journalist'
+import { Journalist, JournalistStatus, JournalistRole } from '../entities/Journalist'
 import { randomUUID } from 'crypto'
 
 export interface CreateJournalistParams {
   name: string
   email: string
+  role?: JournalistRole
   status?: JournalistStatus
   engagementScore?: number
   activeInvestigationsCount?: number
@@ -17,6 +18,7 @@ export class JournalistFactory {
       id,
       params.name,
       params.email,
+      params.role || 'JOURNALIST',
       params.status || 'ACTIVE',
       params.engagementScore || 0,
       new Date(),
