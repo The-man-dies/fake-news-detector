@@ -9,12 +9,12 @@
 ---
 
 ### 🚨 Critical Issues
-- ...
+- N/A
 
 ---
 
 ### 💡 Suggestions
-- ...
+- N/A
 
 ---
 

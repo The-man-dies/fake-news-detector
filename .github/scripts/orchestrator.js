@@ -175,7 +175,8 @@ You will receive:
 }
 
 ## Report Template Structure:
-Follow the provided TEMPLATE exactly, replacing X/10 with actual scores and filling in issues and suggestions.`
+Follow the provided TEMPLATE exactly, replacing X/10 with actual scores.
+If a section has no entries, write "- N/A" instead of leaving it empty.`
 }
 
 // ==========================================
@@ -540,7 +541,9 @@ export async function runDDDReview(diff, dddSummary, readme, template) {
       application: application.issues || [],
       infrastructure: infrastructure.issues || []
     },
-    markdownReport: orchestratorResult.markdownReport || generateDefaultReport(scores, status, domain, application, infrastructure)
+    markdownReport: normalizeMarkdownReport(
+      orchestratorResult.markdownReport || generateDefaultReport(scores, status, domain, application, infrastructure)
+    )
   }
 }
 
@@ -581,4 +584,25 @@ ${suggestions.length > 0
 ### Status
 ${status === 'PASS' ? 'PASS' : 'FAIL'}
 `
+}
+
+function normalizeMarkdownReport(markdownReport = '') {
+  return ensureSectionHasFallback(
+    ensureSectionHasFallback(markdownReport, '### Critical Issues'),
+    '### Suggestions'
+  )
+}
+
+function ensureSectionHasFallback(markdownReport, heading) {
+  const escapedHeading = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const pattern = new RegExp(`(${escapedHeading}\\s*)([\\s\\S]*?)(\\n---|$)`)
+
+  return markdownReport.replace(pattern, (_match, header, content, suffix) => {
+    const trimmedContent = content.trim()
+    if (trimmedContent.length > 0) {
+      return `${header}${content}${suffix}`
+    }
+
+    return `${header}- N/A${suffix}`
+  })
 }
