@@ -5,7 +5,7 @@ import { JournalistFactory } from '../../domain/factories/JournalistFactory'
 import { JournalistStatusReason } from '../../domain/entities/Journalist'
 import { BusinessRuleError } from '../../shared/errors'
 
-export class UserManagementService {
+export class ActorManagementService {
   constructor(
     private directorRepository: IDirectorRepository,
     private journalistRepository: IJournalistRepository,
