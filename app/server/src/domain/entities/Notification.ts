@@ -91,7 +91,7 @@ export class Notification {
           normalizedPublicationId,
         )
       default:
-        throw new Error('Invalid notification type')
+        throw new DomainError('Invalid notification type')
     }
   }
 

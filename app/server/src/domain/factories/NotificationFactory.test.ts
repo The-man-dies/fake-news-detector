@@ -24,4 +24,5 @@ describe('NotificationFactory', () => {
       NotificationFactory.createBatch(['actor-1'], 'Nouveau verdict publie', '   '),
     ).toThrow(DomainError)
   })
+
 })

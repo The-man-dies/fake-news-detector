@@ -1,5 +1,6 @@
 // domain/factories/NotificationFactory.ts
 import { Notification, NotificationType } from '../entities/Notification'
+import { DomainError } from '../../shared/errors'
 
 export class NotificationFactory {
   static create(params: {
@@ -65,10 +66,21 @@ export class NotificationFactory {
     citizenIds: string[],
     message: string,
     publicationId: string,
-    theme?: string,
+    theme: string = 'Publication',
   ): Notification[] {
+    if (!publicationId.trim()) {
+      throw new DomainError(
+        'Batch publication notifications require a publicationId',
+      )
+    }
+
     return citizenIds.map((citizenId) =>
-      Notification.createPublicationNotification(citizenId, theme ?? 'Publication', message, publicationId),
+      Notification.createPublicationNotification(
+        citizenId,
+        theme,
+        message,
+        publicationId,
+      ),
     )
   }
 }
