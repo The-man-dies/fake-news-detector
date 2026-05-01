@@ -7,6 +7,8 @@ import { MAX_REPORTING_PER_CITIZEN_AT_A_TIME } from '../../shared'
 import { DomainError } from '../../shared/errors'
 import { BusinessRuleError } from '../../shared/errors'
 import type { StatusReason, ActorStatus, ActorRole } from '../../shared/types'
+import { WatcherApplication } from './WatcherApplication'
+import { WatcherApplicationFactory } from '../factories/WatcherApplicationFactory'
 
 export type CitizenType = 'REGULAR' | 'WATCHER'
 export type CitizenRole = ActorRole
@@ -112,6 +114,18 @@ export class Citizen {
     this.citizenType = 'WATCHER'
     this.updatedAt = new Date()
   }
+
+  submitWatcherApplication(motivation: string): WatcherApplication {
+    if (!this.canApplyForWatcher()) {
+      throw new DomainError('Cannot apply for watcher: not eligible')
+    }
+    const application = WatcherApplicationFactory.create({
+      actorId: this.id,
+      motivation,
+    })
+    return application
+  }
+    
 
   reportResolved(): void {
     if (this.openReportsCount > 0) {

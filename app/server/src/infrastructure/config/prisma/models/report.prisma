@@ -11,7 +11,7 @@ model Report {
   content String? @db.Text
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
 
   citizenId String
   citizen   Actor  @relation("CitizenReports", fields: [citizenId], references: [id])
@@ -40,7 +40,7 @@ model ReportMedia {
   uploadedBy   Actor  @relation(fields: [uploadedById], references: [id])
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
 
   @@index([reportId])
 }

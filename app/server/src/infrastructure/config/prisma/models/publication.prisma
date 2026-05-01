@@ -22,7 +22,7 @@ model Publication {
   verifiedLinks VerifiedLink[]
 
   createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  updatedAt  DateTime     @updatedAt @default(now())
   correction Correction[]
 
   @@map("publications")
@@ -51,6 +51,7 @@ model VerifiedMedia {
   notifications Notification[]
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 
   @@index([authoritySourceId])
 }
@@ -76,4 +77,5 @@ model VerifiedLink {
   notifications Notification[]
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
 }

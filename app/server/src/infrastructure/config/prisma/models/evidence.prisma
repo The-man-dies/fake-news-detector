@@ -7,7 +7,7 @@ model Evidence {
   content   String   @db.Text
   title     String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
 
   investigationId String
   investigation   Investigation @relation(fields: [investigationId], references: [id], onDelete: Cascade)
@@ -41,7 +41,7 @@ model EvidenceMedia {
   uploadedBy   Actor  @relation(fields: [uploadedById], references: [id])
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt @default(now())
 
   @@index([evidenceId])
 }

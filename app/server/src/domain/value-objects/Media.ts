@@ -49,10 +49,6 @@ export class InvestigationMedia {
     return this.origin === 'JOURNALIST_PROOF'
   }
 
-  hasAuthoritySource(): boolean {
-    return !!this.authoritySourceId
-  }
-
   private validateConsistency(): void {
     if (this.isFromJournalist()) {
       if (this.category || this.reliability) {
@@ -177,7 +173,35 @@ export class EvidenceMedia {
     public updatedAt: Date = new Date(),
   ) {}
 
-  
+  changeCategory(category: MediaCategory): void {
+    this.category = category
+    this.updatedAt = new Date()
+  }
+
+  changeReliability(reliability: Verdict): void {
+    this.reliability = reliability
+    this.updatedAt = new Date()
+  }
+
+  changeJustification(justification: string): void {
+    this.justification = justification
+    this.updatedAt = new Date()
+  }
+
+  changeUrl(url: string): void {
+    this.url = url
+    this.updatedAt = new Date()
+  }
+
+  changeType(type: MediaType): void {
+    this.type = type
+    this.updatedAt = new Date()
+  }
+
+  changeOrder(order: number): void {
+    this.order = order
+    this.updatedAt = new Date()
+  }
 }
 
 // Inbox Subject Media
@@ -205,7 +229,28 @@ export class VerifiedMedia {
     public addedById: string,
     public authoritySourceId?: string,
     public readonly createdAt: Date = new Date(),
+    public updatedAt: Date = new Date(),
   ) {}
+
+  changeAuthoritySourceId(authoritySourceId?: string): void {
+    this.authoritySourceId = authoritySourceId
+    this.updatedAt = new Date()
+  }
+
+  changeUrl(url: string): void {
+    this.url = url
+    this.updatedAt = new Date()
+  }
+
+  changeType(type: MediaType): void {
+    this.type = type
+    this.updatedAt = new Date()
+  }
+
+  changeOrder(order: number): void {
+    this.order = order
+    this.updatedAt = new Date()
+  }
 }
 
 // Verified Link (in Publication)
@@ -215,7 +260,18 @@ export class VerifiedLink {
     public url: string,
     public publicationId: string,
     public addedById: string,
-    public authoritySourceId: string,
+    public authoritySourceId?: string,
     public readonly createdAt: Date = new Date(),
+    public updatedAt: Date = new Date(),
   ) {}
+
+  changeAuthoritySourceId(authoritySourceId?: string): void {
+    this.authoritySourceId = authoritySourceId
+    this.updatedAt = new Date()
+  }
+
+  changeUrl(url: string): void {
+    this.url = url
+    this.updatedAt = new Date()
+  }
 }

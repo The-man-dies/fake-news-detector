@@ -5,7 +5,7 @@ import {
 import { randomUUID } from 'crypto'
 
 type CreateWatcherApplicationParams = {
-  userId: string
+  actorId: string
   motivation: string
 }
 
@@ -13,7 +13,7 @@ export class WatcherApplicationFactory {
   static create(params: CreateWatcherApplicationParams): WatcherApplication {
     return new WatcherApplication(
       randomUUID(),
-      params.userId,
+      params.actorId,
       params.motivation,
       'PENDING' as WatcherApplicationStatus,
     )

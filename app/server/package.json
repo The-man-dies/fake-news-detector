@@ -13,7 +13,7 @@
     "lint": "bunx eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "bun test"
+    "test": "vitest run"
   },
   "dependencies": {
     "@hono/zod-openapi": "^1.2.2",
@@ -27,6 +27,7 @@
     "@prisma/client": "^7.6.0",
     "@types/bun": "latest",
     "prisma": "^7.6.0",
+    "vitest": "^4.1.5",
     "wrangler": "^4.83.0"
   }
 }

@@ -1,4 +1,4 @@
-// application/services/UserManagementService.ts
+// application/services/ActorManagementService.ts
 import { IDirectorRepository } from '../../domain/repositories/IDirectorRepository'
 import { IJournalistRepository } from '../../domain/repositories/IJournalistRepository'
 import { JournalistFactory } from '../../domain/factories/JournalistFactory'
