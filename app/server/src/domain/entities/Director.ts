@@ -54,6 +54,7 @@ export class Director {
     if (!this.isActive()) {
       throw new BusinessRuleError('Director account is not active')
     }
+    this.validateInvestigation(investigation)
     investigation.requestRevision(newStatus)
   }
 
@@ -61,6 +62,7 @@ export class Director {
     if (!this.isActive()) {
       throw new BusinessRuleError('Director account is not active')
     }
+    this.validateInvestigation(investigation)
     this.incrementScoreInvestigation()
     investigation.approve()
   }
@@ -69,6 +71,7 @@ export class Director {
     if (!this.isActive()) {
       throw new BusinessRuleError('Director account is not active')
     }
+    this.validateInvestigation(investigation)
     investigation.markAsArchived()
   }
 

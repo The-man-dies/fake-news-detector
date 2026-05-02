@@ -21,6 +21,10 @@ export class WorkflowAudit {
     return this.newStatus === 'PUBLISHED'
   }
 
+  isArchived(): boolean {
+    return this.newStatus === 'ARCHIVED'
+  }
+
   getDescription(): string {
     if (this.comment) {
       return `Status changed from ${this.previousStatus} to ${this.newStatus}: ${this.comment}`

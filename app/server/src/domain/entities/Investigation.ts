@@ -11,6 +11,13 @@ export type MediaCategory =
   | 'IMPOSTOR'
   | 'OTHER'
 export type Verdict = 'TRUE' | 'FALSE' | 'MISLEADING' | 'UNVERIFIABLE'
+
+/** Verdicts allowed for a standard official publication after director approval */
+export const STANDARD_PUBLICATION_VERDICTS: readonly Verdict[] = [
+  'TRUE',
+  'FALSE',
+  'MISLEADING',
+] as const
 export type InvestigationStatus =
   | 'OPEN'
   | 'IN_PROGRESS'
@@ -54,7 +61,9 @@ export class Investigation {
   }
 
   canMarkAsArchived(): boolean {
-    return this.draftVerdict === 'UNVERIFIABLE' && this.status === 'NEEDS_REVISION'
+    return (
+      this.draftVerdict === 'UNVERIFIABLE' && this.status === 'PENDING_REVIEW'
+    )
   }
 
   // Journalist actions
@@ -92,6 +101,11 @@ export class Investigation {
     if (newStatus !== 'NEEDS_REVISION') {
       throw new BusinessRuleError('Invalid status for rejection')
     }
+    if (this.status !== 'PENDING_REVIEW') {
+      throw new BusinessRuleError(
+        'Investigation must be pending director review to be sent back for revision',
+      )
+    }
     if (this.attemptCount >= MAX_REVISION_ATTEMPTS) {
       throw new DomainError('Maximum rejection attempts reached')
     }
@@ -107,6 +121,11 @@ export class Investigation {
         'Investigation must be pending review to be approved',
       )
     }
+    if (!STANDARD_PUBLICATION_VERDICTS.includes(this.draftVerdict)) {
+      throw new BusinessRuleError(
+        'Publication approval requires a standard verdict (TRUE, FALSE, or MISLEADING); use archive flow for UNVERIFIABLE',
+      )
+    }
     this.status = 'PUBLISHED'
     this.updatedAt = new Date()
   }
@@ -115,7 +134,7 @@ export class Investigation {
   markAsArchived(): void {
     if (!this.canMarkAsArchived()) {
       throw new BusinessRuleError(
-        'Investigation draft verdict must be UNVERIFIABLE and its status must be NEEDS_REVISION',
+        'Investigation must be pending review with draft verdict UNVERIFIABLE to be archived by the director',
       )
     }
     this.status = 'ARCHIVED'

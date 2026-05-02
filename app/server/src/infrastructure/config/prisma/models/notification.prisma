@@ -20,6 +20,9 @@ model Notification {
   publicationId String?
   publication   Publication? @relation(fields: [publicationId], references: [id])
 
+  investigationId String?
+  investigation   Investigation? @relation(fields: [investigationId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
   verifiedMedia VerifiedMedia[]
   verifiedLinks VerifiedLink[]
 
