@@ -57,8 +57,8 @@ export class Notification {
     publicationId?: string,
     investigationId?: string,
   ): Notification {
-    const normalizedPublicationId = publicationId?.trim()
-    const normalizedInvestigationId = investigationId?.trim()
+    const normalizedPublicationId = publicationId?.trim() || undefined
+    const normalizedInvestigationId = investigationId?.trim() || undefined
 
     if ((type === 'PUBLICATION' || type === 'CORRECTION') && !normalizedPublicationId) {
       throw new DomainError(`${type} notification requires a publicationId`)
@@ -68,6 +68,11 @@ export class Notification {
       if (!normalizedInvestigationId) {
         throw new DomainError(
           'ARCHIVED_PUBLICATION notification requires investigationId',
+        )
+      }
+      if (normalizedPublicationId) {
+        throw new DomainError(
+          'ARCHIVED_PUBLICATION notification cannot have a publicationId',
         )
       }
     } else if (normalizedInvestigationId) {
@@ -126,7 +131,7 @@ export class Notification {
           false,
           new Date(),
           new Date(),
-          normalizedPublicationId,
+          undefined,
           normalizedInvestigationId,
         )
       default:

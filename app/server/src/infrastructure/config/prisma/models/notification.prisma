@@ -28,6 +28,7 @@ model Notification {
 
   correction Correction?
 
+  @@index([investigationId])
   @@map("notifications")
 }
 

@@ -56,6 +56,31 @@ describe('Notification', () => {
     ).toThrow(DomainError)
   })
 
+  test('throws when ARCHIVED_PUBLICATION has publicationId', () => {
+    expect(() =>
+      Notification.create(
+        'ARCHIVED_PUBLICATION',
+        'Publication archivée',
+        'Message',
+        'actor-1',
+        'publication-1',
+        'inv-1',
+      ),
+    ).toThrow(DomainError)
+  })
+
+  test('normalizes blank optional ids to undefined for ALERT', () => {
+    const notification = Notification.create(
+      'ALERT',
+      'A',
+      'M',
+      'actor-1',
+      '   ',
+    )
+    expect(notification.publicationId).toBeUndefined()
+    expect(notification.investigationId).toBeUndefined()
+  })
+
   test('throws when investigationId is set for ALERT', () => {
     expect(() =>
       Notification.create('ALERT', 'A', 'M', 'actor-1', undefined, 'inv-1'),
