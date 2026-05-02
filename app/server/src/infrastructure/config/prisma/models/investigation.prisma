@@ -25,6 +25,8 @@ model Investigation {
   media InvestigationMedia[]
   workflowAudits WorkflowAudit[]
 
+  notifications Notification[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt @default(now())
 

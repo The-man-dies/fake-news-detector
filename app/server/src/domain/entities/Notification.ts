@@ -3,7 +3,11 @@
 import { randomUUID } from "crypto"
 import { DomainError } from "../../shared"
 
-export type NotificationType = 'PUBLICATION' | 'CORRECTION' | 'ALERT'
+export type NotificationType =
+  | 'PUBLICATION'
+  | 'CORRECTION'
+  | 'ALERT'
+  | 'ARCHIVED_PUBLICATION'
 
 export class Notification {
   constructor(
@@ -16,6 +20,7 @@ export class Notification {
     public readonly createdAt: Date = new Date(),
     public updatedAt: Date = new Date(),
     public publicationId?: string,
+    public investigationId?: string,
   ) {}
 
   markAsRead(): void {
@@ -40,17 +45,40 @@ export class Notification {
     return this.type === 'ALERT'
   }
 
+  isArchivedPublicationNotification(): boolean {
+    return this.type === 'ARCHIVED_PUBLICATION'
+  }
+
   static create(
     type: NotificationType,
     theme: string,
     message: string,
     actorId: string,
     publicationId?: string,
+    investigationId?: string,
   ): Notification {
-    const normalizedPublicationId = publicationId?.trim()
+    const normalizedPublicationId = publicationId?.trim() || undefined
+    const normalizedInvestigationId = investigationId?.trim() || undefined
 
     if ((type === 'PUBLICATION' || type === 'CORRECTION') && !normalizedPublicationId) {
       throw new DomainError(`${type} notification requires a publicationId`)
+    }
+
+    if (type === 'ARCHIVED_PUBLICATION') {
+      if (!normalizedInvestigationId) {
+        throw new DomainError(
+          'ARCHIVED_PUBLICATION notification requires investigationId',
+        )
+      }
+      if (normalizedPublicationId) {
+        throw new DomainError(
+          'ARCHIVED_PUBLICATION notification cannot have a publicationId',
+        )
+      }
+    } else if (normalizedInvestigationId) {
+      throw new DomainError(
+        `investigationId is only allowed when type is ARCHIVED_PUBLICATION, not ${type}`,
+      )
     }
 
     switch (type) {
@@ -65,6 +93,7 @@ export class Notification {
           new Date(),
           new Date(),
           normalizedPublicationId,
+          undefined,
         )
       case 'CORRECTION':
         return new Notification(
@@ -77,6 +106,7 @@ export class Notification {
           new Date(),
           new Date(),
           normalizedPublicationId,
+          undefined,
         )
       case 'ALERT':
         return new Notification(
@@ -89,6 +119,20 @@ export class Notification {
           new Date(),
           new Date(),
           normalizedPublicationId,
+          undefined,
+        )
+      case 'ARCHIVED_PUBLICATION':
+        return new Notification(
+          randomUUID(),
+          type,
+          theme,
+          message,
+          actorId,
+          false,
+          new Date(),
+          new Date(),
+          undefined,
+          normalizedInvestigationId,
         )
       default:
         throw new DomainError('Invalid notification type')
@@ -105,5 +149,21 @@ export class Notification {
 
   static createAlertNotification(journalistId: string, theme: string, message: string): Notification {
     return this.create('ALERT', theme, message, journalistId)
+  }
+
+  static createArchivedPublicationNotification(
+    actorId: string,
+    theme: string,
+    message: string,
+    investigationId: string,
+  ): Notification {
+    return this.create(
+      'ARCHIVED_PUBLICATION',
+      theme,
+      message,
+      actorId,
+      undefined,
+      investigationId,
+    )
   }
 }

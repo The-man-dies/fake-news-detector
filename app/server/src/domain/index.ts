@@ -19,3 +19,6 @@ export * from './repositories'
 
 // Factories
 export * from './factories'
+
+// Processes (workflow + audit composition)
+export * from './processes/investigationStatusWorkflow'

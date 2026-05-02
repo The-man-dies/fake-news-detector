@@ -21,10 +21,10 @@ In an era of information overload, distinguishing fact from fiction is critical.
 ## Key Features
 
 ### Multi-Role Collaboration
-- **Citizen (Regular)** - Submit reports, track status, view notifications
-- **Citizen (Watcher)** - Privileged citizens who can submit evidence to ongoing investigations
-- **Journalist** - Pick reports, conduct investigations, submit for review
-- **Director** - Validate investigations, manage users, oversee publications
+- **Citizen (REGULAR)** - Submit reports (max 3 open), track status, view notifications, apply for Watcher status
+- **Citizen (WATCHER)** - Privileged citizens who can submit evidence to ongoing investigations (+2 engagement points)
+- **Journalist** - Pick reports, conduct investigations (max 1 active), submit for review
+- **Director (EDITORIAL_DIRECTOR)** - Validate investigations, publish/archive results, manage users, approve Watcher applications
 
 ### Structured Fact-Checking Workflow
 ```
@@ -38,11 +38,13 @@ Report → Investigation → Review → Publication
 5. **Publication** - Verified analysis is published with final verdict
 
 ### Quality Control Mechanisms
-- Maximum 3 open reports per citizen (prevents spam)
-- Maximum 1 active investigation per journalist (ensures quality)
-- Limited revision attempts with clear rejection reasons
-- Watcher promotion system for engaged citizens
-- Engagement scoring to encourage participation
+- **Citizen Report Limit** - Maximum 3 open reports per citizen (`MAX_REPORTING_PER_CITIZEN_AT_A_TIME = 3`)
+- **Journalist Investigation Limit** - Maximum 1 active investigation per journalist (`MAX_INVESTIGATIONS_PER_JOURNALIST_AT_A_TIME = 1`)
+- **Evidence Submission Restriction** - Only citizens with `WATCHER` type can submit evidence
+- **Watcher Promotion System** - Citizens apply via `WatcherApplication`; Director approves/rejects
+- **Revision Attempt Limits** - Maximum attempts for correction cycles (`MAX_REVISION_ATTEMPTS`, `MAX_CORRECTION_ATTEMPTS`)
+- **Engagement Scoring** - Points awarded for participation (submit report: +1, submit evidence: +2, publication: +2)
+- **Account Status Management** - ACTIVE, DISABLED, BANNED states with reasons (SPAM, ABUSE, FRAUD, INACTIVITY, USER_REQUEST, OTHER)
 
 ## Architecture
 
@@ -65,22 +67,65 @@ src/
 
 ### Core Entities
 
-| Entity | Responsibility |
-|--------|---------------|
-| `Actor` | Base user with role (CITIZEN/JOURNALIST/DIRECTOR) |
-| `Citizen` | Report submission, watcher application, evidence submission |
-| `Journalist` | Investigation management, draft creation, submission |
-| `Director` | Validation, user management, inbox subject creation |
-| `Report` | User-submitted suspicious content |
-| `Investigation` | Journalist's fact-checking process and findings |
-| `Evidence` | Supporting documents from watchers |
-| `Publication` | Final approved analysis with verdict |
+| Entity | Responsibility | Key Invariants |
+|--------|---------------|----------------|
+| `Citizen` | Report submission, watcher application, evidence submission (if WATCHER) | Max 3 open reports; Only WATCHER can submit evidence |
+| `Journalist` | Investigation management, draft creation, submission for review | Max 1 active investigation at a time |
+| `Director` | Validation, user management, inbox subject creation, watcher approval | Cannot validate own work; Editorial oversight |
+| `Report` | User-submitted suspicious content with theme, title, content | Can only be picked if status is OPEN |
+| `Investigation` | Journalist's fact-checking process with verdict and media category | Max revision attempts; Requires media category before submission |
+| `Evidence` | Supporting documents submitted by Watchers | Linked to investigation; Submitter must be WATCHER |
+| `Publication` | Final approved analysis with verdict | Can be marked as correction |
+| `WatcherApplication` | Request for citizen to become WATCHER | Status: PENDING → APPROVED/REJECTED |
+| `Notification` | System alerts for users | Types: PUBLICATION, CORRECTION, ALERT, ARCHIVED_PUBLICATION |
+| `InboxSubject` | Topics created by Directors for organization | Managed by Directors only |
 
 ### Investigation Lifecycle
 
 ```
-OPEN → IN_PROGRESS → PENDING_REVIEW → [PUBLISHED | NEEDS_REVISION | UNVERIFIABLE]
+OPEN → IN_PROGRESS → PENDING_REVIEW → [PUBLISHED | ARCHIVED | NEEDS_REVISION → IN_PROGRESS]
 ```
+
+**Status Definitions:**
+- **OPEN** - Initial state when journalist picks a report
+- **IN_PROGRESS** - Journalist working on draft (can edit media category, verdict, notes)
+- **PENDING_REVIEW** - Submitted to Director for validation
+- **NEEDS_REVISION** - Director rejected; sent back for corrections
+- **PUBLISHED** - Director approved; investigation is public
+- **ARCHIVED** - Investigation with UNVERIFIABLE verdict (cannot be verified)
+
+**Transitions:**
+- Journalist: `OPEN` → `IN_PROGRESS` → `PENDING_REVIEW`
+- Director: `PENDING_REVIEW` → `PUBLISHED` (if verdict is TRUE/FALSE/MISLEADING)
+- Director: `PENDING_REVIEW` → `ARCHIVED` (if verdict is UNVERIFIABLE)
+- Director: `PENDING_REVIEW` → `NEEDS_REVISION` (rejection with feedback)
+- Journalist: `NEEDS_REVISION` → `IN_PROGRESS` (correction cycle)
+
+### Domain Values
+
+**Media Categories** (Classification of suspicious content):
+- `CONTEXT_COLLAPSE` - Missing or altered context
+- `MANIPULATED` - Edited or doctored content
+- `FABRICATED` - Completely false/original creation
+- `SATIRE` - Parody or satirical content presented as fact
+- `MISLEADING` - Partially true but misleading presentation
+- `IMPOSTOR` - Impersonation or false attribution
+- `OTHER` - Does not fit other categories
+
+**Verdicts** (Final determination):
+- `TRUE` - Content is accurate
+- `FALSE` - Content is completely false
+- `MISLEADING` - Content is partially true but misleading
+- `UNVERIFIABLE` - Cannot be verified (leads to ARCHIVED status)
+
+**Standard Publication Verdicts**: `TRUE`, `FALSE`, `MISLEADING` (can be published)
+**Archive-only Verdict**: `UNVERIFIABLE` (must be archived, not published)
+
+**Notification Types**:
+- `PUBLICATION` - New publication available
+- `CORRECTION` - Published content corrected
+- `ALERT` - System or administrative alert
+- `ARCHIVED_PUBLICATION` - Investigation archived (unverifiable)
 
 ## Technology Stack
 
@@ -152,20 +197,31 @@ bun test                 # Run tests
 app/
 ├── server/
 │   ├── src/
-│   │   ├── domain/           # Domain layer
-│   │   │   └── entities/
-│   │   ├── application/      # Application layer
-│   │   ├── infrastructure/   # Infrastructure layer
-│   │   │   └── config/
-│   │   │       └── prisma/   # Database schema (src/infrastructure/config/prisma/)
-│   │   └── interfaces/       # Interface layer
-└── web/                      # Frontend (if applicable)
+│   │   ├── domain/              # Domain layer
+│   │   │   ├── entities/        # Core domain entities
+│   │   │   ├── factories/       # Entity factories
+│   │   │   ├── repositories/    # Repository interfaces
+│   │   │   └── services/        # Domain services
+│   │   ├── application/         # Application layer
+│   │   │   └── services/        # Use cases & app services
+│   │   ├── infrastructure/      # Infrastructure layer
+│   │   │   ├── config/          # Database, Prisma config
+│   │   │   └── persistence/     # Repository implementations
+│   │   └── interfaces/          # Interface layer (API controllers, DTOs)
+│   └── prisma/                  # Prisma schema & migrations
+└── web/                         # Frontend (if applicable)
 
-doc/                          # Documentation diagrams
-├── class/                    # Class diagrams
-├── usecase/                  # Use case diagrams
-├── sequence/                 # Sequence diagrams
-└── erd/                      # Entity-Relationship diagrams
+doc/                             # Documentation diagrams
+├── class/                       # Class diagrams
+├── usecase/                     # Use case diagrams
+├── sequence/                    # Sequence diagrams
+├── erd/                         # Entity-Relationship diagrams
+└── ddd-summary.md               # DDD documentation
+
+shared/                          # Shared constants, types, errors
+├── constants.ts                 # Business rule constants
+├── types.ts                     # Shared type definitions
+└── errors.ts                    # Domain & business rule errors
 ```
 
 ## Documentation
@@ -176,6 +232,40 @@ Comprehensive UML diagrams are available in the `/doc` directory:
 - **[Use Case Diagrams](doc/usecase/)** - System functionality by actor
 - **[Sequence Diagrams](doc/sequence/)** - Interaction flows
 - **[ERD](doc/erd/)** - Database schema and relationships
+- **[DDD Summary](doc/ddd-summary.md)** - Domain-Driven Design documentation
+
+## Role-Based Permissions Matrix
+
+### Report & Investigation Management
+| Permission | Citizen | Journalist | Director | Notes |
+|:-----------|:-------:|:----------:|:--------:|:------|
+| Submit Report | ✅ | ❌ | ❌ | Max 3 open reports; Must be ACTIVE |
+| Submit Evidence | ✅* | ❌ | ❌ | *Requires WATCHER type |
+| Pick Report | ❌ | ✅ | ❌ | Max 1 active investigation; Report must be OPEN |
+| Draft Investigation | ❌ | ✅ | ❌ | Update media category, verdict, notes |
+| Submit for Review | ❌ | ✅ | ❌ | Must have media category set |
+| Correct Investigation | ❌ | ✅ | ❌ | After rejection; Limited attempts |
+
+### Validation & Publishing
+| Permission | Citizen | Journalist | Director | Notes |
+|:-----------|:-------:|:----------:|:--------:|:------|
+| Validate Investigation | ❌ | ❌ | ✅ | Approve or reject |
+| Publish Result | ❌ | ❌ | ✅ | Only TRUE/FALSE/MISLEADING verdicts |
+| Archive Investigation | ❌ | ❌ | ✅ | Only UNVERIFIABLE verdicts |
+| Reject for Revision | ❌ | ❌ | ✅ | Send back with feedback |
+
+### User & Watcher Management
+| Permission | Citizen | Journalist | Director | Notes |
+|:-----------|:-------:|:----------:|:--------:|:------|
+| Apply for Watcher | ✅ | ❌ | ❌ | Must be REGULAR citizen |
+| Approve/Reject Watcher App | ❌ | ❌ | ✅ | Review motivation |
+| Ban/Disable/Activate Users | ❌ | ❌ | ✅ | All actor types |
+| Create Inbox Subjects | ❌ | ❌ | ✅ | Organizational topics |
+
+### Legend
+- ✅ **Allowed** — Role has permission
+- ❌ **Denied** — Role cannot perform action
+- * **Conditional** — Requires additional criteria
 
 ## API Endpoints
 
@@ -185,24 +275,54 @@ Comprehensive UML diagrams are available in the `/doc` directory:
 
 ### Reports
 - `POST /api/reports` - Submit new report (Citizen)
-- `GET /api/reports` - List available reports (Journalist)
+- `GET /api/reports` - List available reports (Journalist - OPEN status only)
 - `GET /api/reports/:id` - Get report details
+- `PATCH /api/reports/:id` - Update report content (if not picked)
 
 ### Investigations
-- `POST /api/investigations` - Create investigation (Journalist)
-- `PATCH /api/investigations/:id` - Update investigation draft
-- `POST /api/investigations/:id/submit` - Submit for review
-- `POST /api/investigations/:id/validate` - Validate (Director)
-- `POST /api/investigations/:id/reject` - Reject with reason (Director)
+- `POST /api/investigations` - Create investigation from report (Journalist picks report)
+- `GET /api/investigations` - List investigations (filtered by role)
+- `GET /api/investigations/:id` - Get investigation details
+- `PATCH /api/investigations/:id/draft` - Update investigation draft (mediaCategory, draftVerdict, notes)
+- `POST /api/investigations/:id/submit` - Submit for director review
+- `POST /api/investigations/:id/publish` - Publish investigation (Director - TRUE/FALSE/MISLEADING verdicts)
+- `POST /api/investigations/:id/archive` - Archive investigation (Director - UNVERIFIABLE verdicts)
+- `POST /api/investigations/:id/reject` - Reject with feedback (Director → NEEDS_REVISION)
+- `POST /api/investigations/:id/correct` - Submit corrected draft (Journalist after rejection)
 
 ### Evidence
 - `POST /api/evidence` - Submit evidence (Watcher only)
-- `GET /api/investigations/:id/evidence` - List investigation evidence
+- `GET /api/investigations/:id/evidence` - List evidence for investigation
+- `DELETE /api/evidence/:id` - Remove evidence (Watcher who submitted it)
+
+### Publications
+- `GET /api/publications` - List published investigations
+- `GET /api/publications/:id` - Get publication details
+- `POST /api/publications/:id/correction` - Mark as correction (Director)
 
 ### Watcher Applications
-- `POST /api/watcher-applications` - Apply for watcher status
+- `POST /api/watcher-applications` - Apply for watcher status (Citizen)
 - `GET /api/watcher-applications` - List applications (Director)
-- `PATCH /api/watcher-applications/:id/approve` - Approve application
+- `POST /api/watcher-applications/:id/approve` - Approve application (Director)
+- `POST /api/watcher-applications/:id/reject` - Reject application (Director)
+
+### User Management (Director only)
+- `GET /api/users` - List all users
+- `POST /api/users/:id/ban` - Ban user (with reason)
+- `POST /api/users/:id/disable` - Disable user (with reason)
+- `POST /api/users/:id/activate` - Activate user
+- `GET /api/users/:id/profile` - Get user profile with engagement score
+
+### Notifications
+- `GET /api/notifications` - List user notifications
+- `POST /api/notifications/:id/read` - Mark as read
+- `POST /api/notifications/:id/unread` - Mark as unread
+- `POST /api/notifications/read-all` - Mark all as read
+
+### Inbox Subjects (Director only)
+- `POST /api/inbox-subjects` - Create new subject
+- `GET /api/inbox-subjects` - List subjects
+- `POST /api/inbox-subjects/:id/archive` - Archive subject
 
 ## Contributing
 

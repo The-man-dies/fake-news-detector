@@ -1,9 +1,15 @@
 // domain/entities/index.ts
-export { Citizen, CitizenStatus, CitizenType, StatusReason as CitizenStatusReason } from './Citizen'
-export { Journalist, JournalistStatus, StatusReason as JournalistStatusReason } from './Journalist'
+export { Citizen, CitizenStatus, CitizenType, CitizenStatusReason } from './Citizen'
+export { Journalist, JournalistStatus, JournalistStatusReason } from './Journalist'
 export { Director, DirectorStatus } from './Director'
 export { Report, ReportStatus } from './Report'
-export { Investigation, InvestigationStatus, MediaCategory, Verdict } from './Investigation'
+export {
+  Investigation,
+  InvestigationStatus,
+  MediaCategory,
+  Verdict,
+  STANDARD_PUBLICATION_VERDICTS,
+} from './Investigation'
 export { InboxSubject, InboxSubjectStatus, InboxSubjectOrigin } from './InboxSubject'
 export { Evidence } from './Evidence'
 export { Publication } from './Publication'

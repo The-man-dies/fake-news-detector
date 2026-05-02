@@ -9,6 +9,7 @@ export class NotificationFactory {
     message: string
     actorId: string
     publicationId?: string
+    investigationId?: string
   }): Notification {
     return Notification.create(
       params.type ?? 'ALERT',
@@ -16,6 +17,7 @@ export class NotificationFactory {
       params.message,
       params.actorId,
       params.publicationId,
+      params.investigationId,
     )
   }
 
@@ -51,6 +53,36 @@ export class NotificationFactory {
     publicationId: string,
   ): Notification {
     return Notification.createCorrectionNotification(actorId, correctionTitle, correctionMessage, publicationId)
+  }
+
+  static createArchivedPublicationNotification(
+    actorId: string,
+    theme: string,
+    message: string,
+    investigationId: string,
+  ): Notification {
+    return Notification.createArchivedPublicationNotification(
+      actorId,
+      theme,
+      message,
+      investigationId,
+    )
+  }
+
+  static createArchivedPublicationBatch(
+    actorIds: string[],
+    investigationId: string,
+    message: string,
+    theme: string = 'Archived publication',
+  ): Notification[] {
+    return actorIds.map((id) =>
+      Notification.createArchivedPublicationNotification(
+        id,
+        theme,
+        message,
+        investigationId,
+      ),
+    )
   }
 
   static createPublicationForJournalist(

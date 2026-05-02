@@ -25,4 +25,16 @@ describe('NotificationFactory', () => {
     ).toThrow(DomainError)
   })
 
+  test('createArchivedPublicationBatch attaches investigationId to each notification', () => {
+    const notifications = NotificationFactory.createArchivedPublicationBatch(
+      ['a1', 'a2'],
+      'inv-7',
+      'Enquête archivée (invérifiable).',
+    )
+    expect(notifications).toHaveLength(2)
+    expect(notifications[0].investigationId).toBe('inv-7')
+    expect(notifications[1].investigationId).toBe('inv-7')
+    expect(notifications[0].type).toBe('ARCHIVED_PUBLICATION')
+  })
+
 })

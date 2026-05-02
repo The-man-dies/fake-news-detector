@@ -52,6 +52,36 @@ export class WorkflowAuditFactory {
     })
   }
 
+  /** Journalist submits the investigation for director review */
+  static createSubmissionForReview(
+    investigationId: string,
+    journalistId: string,
+    previousStatus: InvestigationStatus,
+  ): WorkflowAudit {
+    return this.create({
+      investigationId,
+      actorId: journalistId,
+      newStatus: 'PENDING_REVIEW',
+      previousStatus,
+    })
+  }
+
+  /** Director accepts UNVERIFIABLE: investigation archived, no official Publication */
+  static createArchiveUnverifiable(
+    investigationId: string,
+    directorId: string,
+    previousStatus: InvestigationStatus,
+    comment?: string | null,
+  ): WorkflowAudit {
+    return this.create({
+      investigationId,
+      actorId: directorId,
+      newStatus: 'ARCHIVED',
+      previousStatus,
+      comment: comment ?? null,
+    })
+  }
+
   static createStatusChange(
     investigationId: string,
     actorId: string,
