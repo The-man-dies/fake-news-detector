@@ -18,6 +18,8 @@ model Report {
 
   investigation Investigation?
 
+  inboxSubject InboxSubject?
+
   media ReportMedia[]
 
   @@map("reports")

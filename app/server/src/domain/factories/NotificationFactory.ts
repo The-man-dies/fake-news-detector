@@ -69,22 +69,6 @@ export class NotificationFactory {
     )
   }
 
-  static createArchivedPublicationBatch(
-    actorIds: string[],
-    investigationId: string,
-    message: string,
-    theme: string = 'Archived publication',
-  ): Notification[] {
-    return actorIds.map((id) =>
-      Notification.createArchivedPublicationNotification(
-        id,
-        theme,
-        message,
-        investigationId,
-      ),
-    )
-  }
-
   static createPublicationForJournalist(
     journalistId: string,
     theme: string,

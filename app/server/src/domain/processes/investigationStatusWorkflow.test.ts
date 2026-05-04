@@ -17,6 +17,7 @@ describe('investigationStatusWorkflow', () => {
     const inv = new Investigation(
       'i1',
       'r1',
+      null,
       journalist.id,
       'FABRICATED',
       'FALSE',
@@ -24,7 +25,7 @@ describe('investigationStatusWorkflow', () => {
       0,
       'IN_PROGRESS',
     )
-    const audit = submitInvestigationForReviewWithAudit(journalist, inv)
+    const audit = submitInvestigationForReviewWithAudit(journalist, inv, [], [])
     expect(inv.status).toBe('PENDING_REVIEW')
     expect(audit.newStatus).toBe('PENDING_REVIEW')
     expect(audit.previousStatus).toBe('IN_PROGRESS')
@@ -35,6 +36,7 @@ describe('investigationStatusWorkflow', () => {
     const inv = new Investigation(
       'i1',
       'r1',
+      null,
       journalist.id,
       'FABRICATED',
       'TRUE',
@@ -52,6 +54,7 @@ describe('investigationStatusWorkflow', () => {
     const inv = new Investigation(
       'i1',
       'r1',
+      null,
       journalist.id,
       'FABRICATED',
       'TRUE',
@@ -70,6 +73,7 @@ describe('investigationStatusWorkflow', () => {
     const inv = new Investigation(
       'i1',
       'r1',
+      null,
       journalist.id,
       'FABRICATED',
       'UNVERIFIABLE',

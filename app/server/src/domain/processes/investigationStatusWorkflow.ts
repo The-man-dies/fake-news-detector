@@ -6,11 +6,20 @@ import { Journalist } from '../entities/Journalist'
 import { Investigation } from '../entities/Investigation'
 import { WorkflowAudit } from '../entities/WorkflowAudit'
 import { WorkflowAuditFactory } from '../factories/WorkflowAuditFactory'
+import {
+  assertInvestigationReadyForDirectorReview,
+  assertWatcherEvidenceMediaCompleteForReview,
+  type EvidenceWithMedia,
+} from './investigationReviewReadiness'
 
 export function submitInvestigationForReviewWithAudit(
   journalist: Journalist,
   investigation: Investigation,
+  investigationMedia: InvestigationMedia[],
+  evidenceBundles: EvidenceWithMedia[],
 ): WorkflowAudit {
+  assertInvestigationReadyForDirectorReview(investigation, investigationMedia)
+  assertWatcherEvidenceMediaCompleteForReview(evidenceBundles)
   const previousStatus = investigation.status
   journalist.submitForReview(investigation)
   return WorkflowAuditFactory.createSubmissionForReview(

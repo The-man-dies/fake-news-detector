@@ -7,6 +7,7 @@ describe('Investigation director review invariants', () => {
     const inv = new Investigation(
       'i1',
       'r1',
+      null,
       'j1',
       'MISLEADING',
       'UNVERIFIABLE',
@@ -21,6 +22,7 @@ describe('Investigation director review invariants', () => {
     const inv = new Investigation(
       'i1',
       'r1',
+      null,
       'j1',
       'MISLEADING',
       'TRUE',
@@ -36,6 +38,7 @@ describe('Investigation director review invariants', () => {
     const inv = new Investigation(
       'i1',
       'r1',
+      null,
       'j1',
       'MISLEADING',
       'UNVERIFIABLE',
@@ -51,6 +54,7 @@ describe('Investigation director review invariants', () => {
     const inv = new Investigation(
       'i1',
       'r1',
+      null,
       'j1',
       'MISLEADING',
       'TRUE',

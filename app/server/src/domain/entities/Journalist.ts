@@ -3,6 +3,7 @@
 
 import { Investigation, MediaCategory, Verdict } from './Investigation'
 import { Report } from './Report'
+import { InboxSubject } from './InboxSubject'
 import { BusinessRuleError, DomainError } from '../../shared/errors'
 import { MAX_CORRECTION_ATTEMPTS, MAX_INVESTIGATIONS_PER_JOURNALIST_AT_A_TIME } from '../../shared'
 import { StatusReason, ActorStatus, ActorRole } from '../../shared/types'
@@ -69,6 +70,44 @@ export class Journalist {
     return new Investigation(
       crypto.randomUUID(),
       report.id,
+      null,
+      this.id,
+      null,
+      'UNVERIFIABLE',
+      '',
+      0,
+      'OPEN',
+    )
+  }
+
+  pickDirectorInboxSubject(subject: InboxSubject): Investigation {
+    if (!this.canPickReport()) {
+      throw new BusinessRuleError(
+        'Cannot pick subject: maximum active investigations reached',
+      )
+    }
+    if (subject.origin !== 'DIRECTOR_INITIATED') {
+      throw new BusinessRuleError(
+        'Only director-initiated inbox subjects can be picked this way',
+      )
+    }
+    if (!subject.isOpen()) {
+      throw new BusinessRuleError('Inbox subject is not available for picking')
+    }
+    if (subject.isArchived()) {
+      throw new BusinessRuleError('Inbox subject is archived')
+    }
+
+    this.activeInvestigationsCount++
+    this.incrementEngagementScore()
+    this.updatedAt = new Date()
+
+    subject.startProgress()
+
+    return new Investigation(
+      crypto.randomUUID(),
+      null,
+      subject.id,
       this.id,
       null,
       'UNVERIFIABLE',

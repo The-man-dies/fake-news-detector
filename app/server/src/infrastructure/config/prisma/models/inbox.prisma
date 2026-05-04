@@ -16,7 +16,12 @@ model InboxSubject {
   createdById String
   createdBy   Actor  @relation("InboxSubjectCreator", fields: [createdById], references: [id])
 
+  reportId String? @unique
+  report   Report? @relation(fields: [reportId], references: [id], onDelete: SetNull)
+
   media InboxSubjectMedia[]
+
+  investigation Investigation?
 
   @@map("inbox_subjects")
 }
@@ -30,6 +35,8 @@ model InboxSubjectMedia {
   url   String
   type  MediaType
   order Int
+
+  origin InboxSubjectMediaOrigin @default(DIRECTOR_INITIATED)
 
   inboxSubjectId String
   inboxSubject   InboxSubject @relation(fields: [inboxSubjectId], references: [id], onDelete: Cascade)

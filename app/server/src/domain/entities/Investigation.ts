@@ -29,7 +29,8 @@ export type InvestigationStatus =
 export class Investigation {
   constructor(
     public readonly id: string,
-    public reportId: string,
+    public reportId: string | null,
+    public inboxSubjectId: string | null,
     public journalistId: string,
     public mediaCategory: MediaCategory | null = null,
     public draftVerdict: Verdict = 'UNVERIFIABLE',
@@ -38,7 +39,34 @@ export class Investigation {
     public status: InvestigationStatus = 'OPEN',
     public readonly createdAt: Date = new Date(),
     public updatedAt: Date = new Date(),
-  ) {}
+  ) {
+    Investigation.assertExactlyOneSource(reportId, inboxSubjectId)
+  }
+
+  static assertExactlyOneSource(
+    reportId: string | null,
+    inboxSubjectId: string | null,
+  ): void {
+    const r = reportId?.trim() || null
+    const i = inboxSubjectId?.trim() || null
+    const hasReport = r != null
+    const hasInbox = i != null
+    if (hasReport === hasInbox) {
+      throw new DomainError(
+        'Investigation must have exactly one of reportId or inboxSubjectId',
+      )
+    }
+  }
+
+  isFromReport(): boolean {
+    return this.reportId != null && this.reportId.trim() !== ''
+  }
+
+  isFromDirectorInbox(): boolean {
+    return (
+      this.inboxSubjectId != null && this.inboxSubjectId.trim() !== ''
+    )
+  }
 
   isDraft(): boolean {
     return this.status === 'IN_PROGRESS' || this.status === 'NEEDS_REVISION'

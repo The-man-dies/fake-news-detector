@@ -1,6 +1,13 @@
 // domain/entities/Report.ts
 
-export type ReportStatus = 'OPEN' | 'IN_PROGRESS' | 'PENDING_REVIEW' | 'NEEDS_REVISION' | 'PUBLISHED' | 'UNVERIFIABLE'
+export type ReportStatus =
+  | 'OPEN'
+  | 'IN_PROGRESS'
+  | 'PENDING_REVIEW'
+  | 'NEEDS_REVISION'
+  | 'PUBLISHED'
+  | 'UNVERIFIABLE'
+  | 'ARCHIVED'
 
 export class Report {
   constructor(
