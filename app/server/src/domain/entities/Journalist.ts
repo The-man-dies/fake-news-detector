@@ -51,44 +51,10 @@ export class Journalist {
   }
 
   // Business actions
-  pickReport(report: Report): Investigation {
+  pickInboxSubject(subject: InboxSubject): Investigation {
     if (!this.canPickReport()) {
       throw new BusinessRuleError(
-        'Cannot pick report: maximum active investigations reached',
-      )
-    }
-    if (!report.canBePicked()) {
-      throw new BusinessRuleError('Report is not available for picking')
-    }
-
-    this.activeInvestigationsCount++
-    this.incrementEngagementScore()
-    this.updatedAt = new Date()
-
-    report.changeStatus('IN_PROGRESS')
-
-    return new Investigation(
-      crypto.randomUUID(),
-      report.id,
-      null,
-      this.id,
-      null,
-      'UNVERIFIABLE',
-      '',
-      0,
-      'OPEN',
-    )
-  }
-
-  pickDirectorInboxSubject(subject: InboxSubject): Investigation {
-    if (!this.canPickReport()) {
-      throw new BusinessRuleError(
-        'Cannot pick subject: maximum active investigations reached',
-      )
-    }
-    if (subject.origin !== 'DIRECTOR_INITIATED') {
-      throw new BusinessRuleError(
-        'Only director-initiated inbox subjects can be picked this way',
+        'Cannot pick inbox subject: maximum active investigations reached',
       )
     }
     if (!subject.isOpen()) {
@@ -104,10 +70,13 @@ export class Journalist {
 
     subject.startProgress()
 
+    const reportId = subject.origin === 'REPORT' ? subject.reportId : null
+    const inboxSubjectId = subject.id
+
     return new Investigation(
       crypto.randomUUID(),
-      null,
-      subject.id,
+      reportId,
+      inboxSubjectId,
       this.id,
       null,
       'UNVERIFIABLE',

@@ -221,35 +221,7 @@ export class FactCheckingService {
   // Journalist flows
   // ---------------------------------------------------------------------------
 
-  async pickReport(
-    journalistId: string,
-    reportId: string,
-  ): Promise<Investigation> {
-    const journalist = await this.journalistRepository.findById(journalistId)
-    if (!journalist) throw new NotFoundError('Journalist', journalistId)
-
-    const report = await this.reportRepository.findById(reportId)
-    if (!report) throw new NotFoundError('Report', reportId)
-
-    const investigation = journalist.pickReport(report)
-
-    await this.reportRepository.save(report)
-    await this.journalistRepository.update(journalist)
-    await this.investigationRepository.save(investigation)
-
-    const reportRows = await this.reportMediaRepository.findByReportId(reportId)
-    const copies = copySourceMediaToInvestigationMedia(investigation.id, {
-      type: 'REPORT',
-      rows: reportRows,
-    })
-    if (copies.length > 0) {
-      await this.investigationMediaRepository.saveMany(investigation.id, copies)
-    }
-
-    return investigation
-  }
-
-  async pickDirectorInboxSubject(
+  async pickInboxSubject(
     journalistId: string,
     inboxSubjectId: string,
   ): Promise<Investigation> {
@@ -259,20 +231,35 @@ export class FactCheckingService {
     const subject = await this.inboxSubjectRepository.findById(inboxSubjectId)
     if (!subject) throw new NotFoundError('InboxSubject', inboxSubjectId)
 
-    const investigation = journalist.pickDirectorInboxSubject(subject)
+    const investigation = journalist.pickInboxSubject(subject)
 
     await this.inboxSubjectRepository.update(subject)
     await this.journalistRepository.update(journalist)
     await this.investigationRepository.save(investigation)
 
-    const inboxRows =
-      await this.inboxSubjectMediaRepository.findByInboxSubjectId(inboxSubjectId)
-    const copies = copySourceMediaToInvestigationMedia(investigation.id, {
-      type: 'INBOX_DIRECTOR',
-      rows: inboxRows,
-    })
-    if (copies.length > 0) {
-      await this.investigationMediaRepository.saveMany(investigation.id, copies)
+    if (subject.origin === 'REPORT' && subject.reportId) {
+      const reportRows = await this.reportMediaRepository.findByReportId(
+        subject.reportId,
+      )
+      const copies = copySourceMediaToInvestigationMedia(investigation.id, {
+        type: 'REPORT',
+        rows: reportRows,
+      })
+      if (copies.length > 0) {
+        await this.investigationMediaRepository.saveMany(investigation.id, copies)
+      }
+    } else if (subject.origin === 'DIRECTOR_INITIATED') {
+      const inboxRows =
+        await this.inboxSubjectMediaRepository.findByInboxSubjectId(
+          inboxSubjectId,
+        )
+      const copies = copySourceMediaToInvestigationMedia(investigation.id, {
+        type: 'INBOX_DIRECTOR',
+        rows: inboxRows,
+      })
+      if (copies.length > 0) {
+        await this.investigationMediaRepository.saveMany(investigation.id, copies)
+      }
     }
 
     return investigation
