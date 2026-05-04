@@ -158,7 +158,7 @@ OPEN → IN_PROGRESS → PENDING_REVIEW → [PUBLISHED | ARCHIVED | NEEDS_REVISI
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/The-man-dies/fake-news-detector.git
 cd fake-news-detector
 ```
 
