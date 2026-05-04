@@ -43,6 +43,10 @@ Report → Investigation → Review → Publication
 - **Evidence Submission Restriction** - Only citizens with `WATCHER` type can submit evidence
 - **Watcher Promotion System** - Citizens apply via `WatcherApplication`; Director approves/rejects
 - **Revision Attempt Limits** - Maximum attempts for correction cycles (`MAX_REVISION_ATTEMPTS`, `MAX_CORRECTION_ATTEMPTS`)
+- **Media Origin Tracking** - All media tracked by origin: `CITIZEN_REPORT`, `DIRECTOR_INITIATED`, `JOURNALIST_PROOF`
+- **Source Media Classification** - Citizen/Director media require category, reliability, justification by journalist
+- **Journalist Proof Requirements** - Journalist-added media require authority source, no classification fields
+- **Watcher Evidence Media** - Watcher contributions require at least one media with complete classification
 - **Engagement Scoring** - Points awarded for participation (submit report: +1, submit evidence: +2, publication: +2)
 - **Account Status Management** - ACTIVE, DISABLED, BANNED states with reasons (SPAM, ABUSE, FRAUD, INACTIVITY, USER_REQUEST, OTHER)
 
@@ -54,10 +58,13 @@ The application follows DDD principles with clear bounded contexts:
 
 ```
 src/
-├── domain/           # Business logic and entities
-│   ├── entities/     # Core domain objects
-│   ├── value-objects/# Immutable value types
-│   └── services/     # Domain services
+├── domain/              # Business logic and entities
+│   ├── entities/        # Core domain objects
+│   ├── value-objects/   # Immutable value types (Media, VerifiedMedia, etc.)
+│   ├── factories/       # Entity factories
+│   ├── repositories/    # Repository interfaces
+│   ├── services/        # Domain services
+│   └── processes/       # Complex business processes (workflow orchestration)
 ├── application/      # Use cases and application services
 ├── infrastructure/   # Technical implementations
 │   ├── config/       # Database, Prisma
@@ -77,8 +84,8 @@ src/
 | `Evidence` | Supporting documents submitted by Watchers | Linked to investigation; Submitter must be WATCHER |
 | `Publication` | Final approved analysis with verdict | Can be marked as correction |
 | `WatcherApplication` | Request for citizen to become WATCHER | Status: PENDING → APPROVED/REJECTED |
-| `Notification` | System alerts for users | Types: PUBLICATION, CORRECTION, ALERT, ARCHIVED_PUBLICATION |
-| `InboxSubject` | Topics created by Directors for organization | Managed by Directors only |
+| `Notification` | System alerts for users | Types: PUBLICATION, CORRECTION, ALERT, ARCHIVED_PUBLICATION. Targeted notifications for archived investigations |
+| `InboxSubject` | Topics created by Directors for organization | Managed by Directors only; Origin: REPORT or DIRECTOR_INITIATED |
 
 ### Investigation Lifecycle
 
@@ -122,10 +129,14 @@ OPEN → IN_PROGRESS → PENDING_REVIEW → [PUBLISHED | ARCHIVED | NEEDS_REVISI
 **Archive-only Verdict**: `UNVERIFIABLE` (must be archived, not published)
 
 **Notification Types**:
-- `PUBLICATION` - New publication available
+- `PUBLICATION` - New publication available (broadcast to all citizens)
 - `CORRECTION` - Published content corrected
 - `ALERT` - System or administrative alert
-- `ARCHIVED_PUBLICATION` - Investigation archived (unverifiable)
+- `ARCHIVED_PUBLICATION` - Investigation archived with UNVERIFIABLE verdict (targeted: journalist + citizen + watchers only)
+
+**Notification Behavior**:
+- **Publications** (TRUE/FALSE/MISLEADING verdicts): Broadcast to all citizens + journalist notification
+- **Archived Publications** (UNVERIFIABLE verdicts): Targeted notifications only to stakeholders (journalist who investigated, citizen who reported, watchers who contributed evidence)
 
 ## Technology Stack
 
@@ -199,9 +210,11 @@ app/
 │   ├── src/
 │   │   ├── domain/              # Domain layer
 │   │   │   ├── entities/        # Core domain entities
+│   │   │   ├── value-objects/   # Media, VerifiedMedia, EvidenceMedia, etc.
 │   │   │   ├── factories/       # Entity factories
 │   │   │   ├── repositories/    # Repository interfaces
-│   │   │   └── services/        # Domain services
+│   │   │   ├── services/        # Domain services
+│   │   │   └── processes/       # Workflow orchestration (investigationStatusWorkflow, investigationReviewReadiness, investigationMediaCopy)
 │   │   ├── application/         # Application layer
 │   │   │   └── services/        # Use cases & app services
 │   │   ├── infrastructure/      # Infrastructure layer
