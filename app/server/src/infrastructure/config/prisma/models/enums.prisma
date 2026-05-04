@@ -40,10 +40,6 @@ enum CitizenType {
 enum ReportStatus {
   OPEN
   IN_PROGRESS
-  PENDING_REVIEW
-  NEEDS_REVISION
-  PUBLISHED
-  UNVERIFIABLE
   ARCHIVED
 }
 

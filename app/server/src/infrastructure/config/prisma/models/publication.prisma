@@ -13,8 +13,8 @@ model Publication {
 
   finalVerdict Verdict
 
-  publishedAt  DateTime @default(now())
-  isCorrection Boolean  @default(false)
+  publishedAt         DateTime @default(now())
+  receivedACorrection Boolean  @default(false)
 
   notifications Notification[]
 

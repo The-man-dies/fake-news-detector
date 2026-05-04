@@ -8,7 +8,7 @@ export interface CreatePublicationParams {
   approvedById: string
   finalVerdict: Verdict
   publishedAt?: Date
-  isCorrection?: boolean
+  receivedACorrection?: boolean
 }
 
 export class PublicationFactory {
@@ -20,7 +20,7 @@ export class PublicationFactory {
       params.approvedById,
       params.finalVerdict,
       params.publishedAt ?? new Date(),
-      params.isCorrection || false,
+      params.receivedACorrection || false,
       new Date(),
       new Date(),
     )

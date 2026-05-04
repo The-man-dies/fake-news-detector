@@ -3,10 +3,6 @@
 export type ReportStatus =
   | 'OPEN'
   | 'IN_PROGRESS'
-  | 'PENDING_REVIEW'
-  | 'NEEDS_REVISION'
-  | 'PUBLISHED'
-  | 'UNVERIFIABLE'
   | 'ARCHIVED'
 
 export class Report {
