@@ -13,6 +13,7 @@ model Actor {
 
   engagementScore Int      @default(0)
   lastInboxRead   DateTime @default(now())
+  openReportsCount Int     @default(0)
 
   statusReason        StatusReason?
   statusReasonDetails String?
