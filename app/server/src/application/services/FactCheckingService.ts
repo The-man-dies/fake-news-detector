@@ -656,6 +656,12 @@ export class FactCheckingService {
       report.changeStatus('ARCHIVED')
       await this.reportRepository.save(report)
 
+      const citizen = await this.citizenRepository.findById(report.citizenId)
+      if (citizen) {
+        citizen.reportResolved()
+        await this.citizenRepository.update(citizen)
+      }
+
       const inboxSubject = await this.inboxSubjectRepository.findByReportId(
         investigation.reportId,
       )
