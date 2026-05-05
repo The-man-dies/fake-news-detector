@@ -77,8 +77,7 @@ export interface ReportSummaryDto {
 
 export interface InvestigationSummaryDto {
   id: string
-  reportId: string | null
-  inboxSubjectId: string | null
+  inboxSubjectId: string
   journalistId: string
   status: string
   draftVerdict: string
@@ -228,7 +227,7 @@ export class QueryService {
     const subject = await this.inboxSubjectRepository.findById(inboxSubjectId)
     if (!subject) throw new NotFoundError('InboxSubject', inboxSubjectId)
 
-    let media: InboxSubjectMediaItemDto[] = []
+    let media: InboxSubjectMediaItemDto[]
     if (subject.origin === 'REPORT' && subject.reportId) {
       const rows = await this.reportMediaRepository.findByReportId(
         subject.reportId,
@@ -322,7 +321,6 @@ export class QueryService {
   ): InvestigationSummaryDto {
     return {
       id: investigation.id,
-      reportId: investigation.reportId,
       inboxSubjectId: investigation.inboxSubjectId,
       journalistId: investigation.journalistId,
       status: investigation.status,

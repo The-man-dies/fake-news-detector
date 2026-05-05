@@ -13,8 +13,7 @@ describe('investigationReviewReadiness', () => {
   test('assertInvestigation passes when source media fully classified', () => {
     const inv = new Investigation(
       'i1',
-      'r1',
-      null,
+      'is1',
       'j1',
       'FABRICATED',
       'FALSE',
@@ -42,8 +41,7 @@ describe('investigationReviewReadiness', () => {
   test('assertInvestigation throws when source media missing justification', () => {
     const inv = new Investigation(
       'i1',
-      'r1',
-      null,
+      'is1',
       'j1',
       'FABRICATED',
       'FALSE',

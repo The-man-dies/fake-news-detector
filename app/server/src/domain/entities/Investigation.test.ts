@@ -6,8 +6,7 @@ describe('Investigation director review invariants', () => {
   test('approve rejects UNVERIFIABLE verdict', () => {
     const inv = new Investigation(
       'i1',
-      'r1',
-      null,
+      'is1',
       'j1',
       'MISLEADING',
       'UNVERIFIABLE',
@@ -21,8 +20,7 @@ describe('Investigation director review invariants', () => {
   test('approve allows TRUE from PENDING_REVIEW', () => {
     const inv = new Investigation(
       'i1',
-      'r1',
-      null,
+      'is1',
       'j1',
       'MISLEADING',
       'TRUE',
@@ -37,8 +35,7 @@ describe('Investigation director review invariants', () => {
   test('markAsArchived allows UNVERIFIABLE in PENDING_REVIEW', () => {
     const inv = new Investigation(
       'i1',
-      'r1',
-      null,
+      'is1',
       'j1',
       'MISLEADING',
       'UNVERIFIABLE',
@@ -53,8 +50,7 @@ describe('Investigation director review invariants', () => {
   test('requestRevision requires PENDING_REVIEW', () => {
     const inv = new Investigation(
       'i1',
-      'r1',
-      null,
+      'is1',
       'j1',
       'MISLEADING',
       'TRUE',

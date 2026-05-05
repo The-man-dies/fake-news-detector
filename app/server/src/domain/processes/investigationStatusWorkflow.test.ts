@@ -16,8 +16,7 @@ describe('investigationStatusWorkflow', () => {
   test('submitInvestigationForReviewWithAudit records transition to PENDING_REVIEW', () => {
     const inv = new Investigation(
       'i1',
-      'r1',
-      null,
+      'is1',
       journalist.id,
       'FABRICATED',
       'FALSE',
@@ -35,8 +34,7 @@ describe('investigationStatusWorkflow', () => {
   test('directorApproveInvestigationWithAudit records PUBLISHED', () => {
     const inv = new Investigation(
       'i1',
-      'r1',
-      null,
+      'is1',
       journalist.id,
       'FABRICATED',
       'TRUE',
@@ -53,8 +51,7 @@ describe('investigationStatusWorkflow', () => {
   test('directorRejectInvestigationWithAudit records NEEDS_REVISION with comment', () => {
     const inv = new Investigation(
       'i1',
-      'r1',
-      null,
+      'is1',
       journalist.id,
       'FABRICATED',
       'TRUE',
@@ -72,8 +69,7 @@ describe('investigationStatusWorkflow', () => {
   test('directorAcceptUnverifiableArchiveWithAudit records ARCHIVED', () => {
     const inv = new Investigation(
       'i1',
-      'r1',
-      null,
+      'is1',
       journalist.id,
       'FABRICATED',
       'UNVERIFIABLE',

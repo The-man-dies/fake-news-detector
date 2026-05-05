@@ -44,7 +44,6 @@ import {
 } from '../../domain/processes/investigationStatusWorkflow'
 import {
   BusinessRuleError,
-  DomainError,
   NotFoundError,
   ValidationError,
 } from '../../shared/errors'
