@@ -16,8 +16,6 @@ model Report {
   citizenId String
   citizen   Actor  @relation("CitizenReports", fields: [citizenId], references: [id])
 
-  investigation Investigation?
-
   inboxSubject InboxSubject?
 
   media ReportMedia[]

@@ -6,11 +6,8 @@ model Investigation {
   id String @id @default(uuid())
   status InvestigationStatus @default(OPEN)
 
-  reportId String? @unique
-  report   Report? @relation(fields: [reportId], references: [id], onDelete: Cascade)
-
-  inboxSubjectId String? @unique
-  inboxSubject   InboxSubject? @relation(fields: [inboxSubjectId], references: [id], onDelete: Cascade)
+  inboxSubjectId String @unique
+  inboxSubject   InboxSubject @relation(fields: [inboxSubjectId], references: [id], onDelete: Cascade)
 
   journalistId String
   journalist   Actor  @relation("JournalistInvestigations", fields: [journalistId], references: [id])

@@ -2,7 +2,6 @@
 // Bounded Context: Investigation Management
 
 import { Investigation, MediaCategory, Verdict } from './Investigation'
-import { Report } from './Report'
 import { InboxSubject } from './InboxSubject'
 import { BusinessRuleError, DomainError } from '../../shared/errors'
 import { MAX_CORRECTION_ATTEMPTS, MAX_INVESTIGATIONS_PER_JOURNALIST_AT_A_TIME } from '../../shared'
@@ -70,13 +69,9 @@ export class Journalist {
 
     subject.startProgress()
 
-    const reportId = subject.origin === 'REPORT' ? subject.reportId : null
-    const inboxSubjectId = subject.id
-
     return new Investigation(
       crypto.randomUUID(),
-      reportId,
-      inboxSubjectId,
+      subject.id,
       this.id,
       null,
       'UNVERIFIABLE',

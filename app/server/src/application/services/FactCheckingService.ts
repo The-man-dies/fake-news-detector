@@ -110,6 +110,7 @@ export class FactCheckingService {
       content: input.content,
     })
     citizen.incrementEngagementScore()
+    citizen.openReportsCount++
     await this.reportRepository.save(report)
 
     if (input.media?.length) {
@@ -633,12 +634,24 @@ export class FactCheckingService {
   private async closeReportAndLinkedInboxAfterInvestigation(
     investigation: Investigation,
   ): Promise<Report | null> {
-    if (investigation.reportId) {
-      const report = await this.reportRepository.findById(
-        investigation.reportId,
-      )
+    const subject = await this.inboxSubjectRepository.findById(
+      investigation.inboxSubjectId,
+    )
+    if (!subject) {
+      throw new NotFoundError('InboxSubject', investigation.inboxSubjectId)
+    }
+
+    // Archiver l'inbox subject
+    if (!subject.isArchived()) {
+      subject.archive()
+      await this.inboxSubjectRepository.update(subject)
+    }
+
+    // Si le sujet vient d'un report, archiver le report et mettre à jour le citoyen
+    if (subject.origin === 'REPORT' && subject.reportId) {
+      const report = await this.reportRepository.findById(subject.reportId)
       if (!report) {
-        throw new NotFoundError('Report', investigation.reportId)
+        throw new NotFoundError('Report', subject.reportId)
       }
       report.changeStatus('ARCHIVED')
       await this.reportRepository.save(report)
@@ -648,29 +661,10 @@ export class FactCheckingService {
         citizen.reportResolved()
         await this.citizenRepository.update(citizen)
       }
-
-      const inboxSubject = await this.inboxSubjectRepository.findByReportId(
-        investigation.reportId,
-      )
-      if (inboxSubject && !inboxSubject.isArchived()) {
-        inboxSubject.archive()
-        await this.inboxSubjectRepository.update(inboxSubject)
-      }
       return report
     }
 
-    if (investigation.inboxSubjectId) {
-      const subject = await this.inboxSubjectRepository.findById(
-        investigation.inboxSubjectId,
-      )
-      if (subject && !subject.isArchived()) {
-        subject.archive()
-        await this.inboxSubjectRepository.update(subject)
-      }
-      return null
-    }
-
-    throw new DomainError('Investigation has no report or inbox subject source')
+    return null
   }
 
   private async finalizeJournalistInvestigationSlot(
