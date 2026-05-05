@@ -1,9 +1,6 @@
 // domain/entities/Report.ts
 
-export type ReportStatus =
-  | 'OPEN'
-  | 'IN_PROGRESS'
-  | 'ARCHIVED'
+export type ReportStatus = 'OPEN' | 'ARCHIVED'
 
 export class Report {
   constructor(
@@ -21,7 +18,7 @@ export class Report {
     return this.status === 'OPEN'
   }
 
-  canBePicked(): boolean {
+  canBeArchived(): boolean {
     return this.status === 'OPEN'
   }
 

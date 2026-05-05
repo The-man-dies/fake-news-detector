@@ -39,7 +39,6 @@ enum CitizenType {
 
 enum ReportStatus {
   OPEN
-  IN_PROGRESS
   ARCHIVED
 }
 
