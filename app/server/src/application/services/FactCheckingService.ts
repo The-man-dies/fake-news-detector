@@ -32,7 +32,10 @@ import { AuthoritySourceFactory } from '../../domain/factories/AuthoritySourceFa
 import { InvestigationMediaFactory } from '../../domain/factories/MediaFactory'
 import { Investigation } from '../../domain/entities/Investigation'
 import { Report } from '../../domain/entities/Report'
-import type { MediaCategory, Verdict } from '../../domain/entities/Investigation'
+import type {
+  MediaCategory,
+  Verdict,
+} from '../../domain/entities/Investigation'
 import type { MediaType } from '../../domain/value-objects'
 import type { SourceType } from '../../domain/entities/AuthoritySource'
 import { copySourceMediaToInvestigationMedia } from '../../domain/processes/investigationMediaCopy'
@@ -150,7 +153,9 @@ export class FactCheckingService {
     input: SubmitWatcherEvidenceInput,
   ): Promise<string> {
     if (!input.media?.length) {
-      throw new ValidationError('Watcher evidence requires at least one media item')
+      throw new ValidationError(
+        'Watcher evidence requires at least one media item',
+      )
     }
     const citizen = await this.citizenRepository.findById(input.citizenId)
     if (!citizen) throw new NotFoundError('Citizen', input.citizenId)
@@ -246,7 +251,10 @@ export class FactCheckingService {
         rows: reportRows,
       })
       if (copies.length > 0) {
-        await this.investigationMediaRepository.saveMany(investigation.id, copies)
+        await this.investigationMediaRepository.saveMany(
+          investigation.id,
+          copies,
+        )
       }
     } else if (subject.origin === 'DIRECTOR_INITIATED') {
       const inboxRows =
@@ -258,7 +266,10 @@ export class FactCheckingService {
         rows: inboxRows,
       })
       if (copies.length > 0) {
-        await this.investigationMediaRepository.saveMany(investigation.id, copies)
+        await this.investigationMediaRepository.saveMany(
+          investigation.id,
+          copies,
+        )
       }
     }
 
@@ -309,7 +320,8 @@ export class FactCheckingService {
   ): Promise<void> {
     const investigation =
       await this.investigationRepository.findById(investigationId)
-    if (!investigation) throw new NotFoundError('Investigation', investigationId)
+    if (!investigation)
+      throw new NotFoundError('Investigation', investigationId)
     if (investigation.journalistId !== journalistId) {
       throw new BusinessRuleError('Investigation belongs to another journalist')
     }
@@ -343,7 +355,8 @@ export class FactCheckingService {
   ): Promise<void> {
     const investigation =
       await this.investigationRepository.findById(investigationId)
-    if (!investigation) throw new NotFoundError('Investigation', investigationId)
+    if (!investigation)
+      throw new NotFoundError('Investigation', investigationId)
     if (investigation.journalistId !== journalistId) {
       throw new BusinessRuleError('Investigation belongs to another journalist')
     }
@@ -374,7 +387,8 @@ export class FactCheckingService {
   ): Promise<void> {
     const investigation =
       await this.investigationRepository.findById(investigationId)
-    if (!investigation) throw new NotFoundError('Investigation', investigationId)
+    if (!investigation)
+      throw new NotFoundError('Investigation', investigationId)
     if (investigation.journalistId !== journalistId) {
       throw new BusinessRuleError('Investigation belongs to another journalist')
     }
@@ -391,9 +405,7 @@ export class FactCheckingService {
       )
     const order =
       input.order ??
-      (existing.length > 0
-        ? Math.max(...existing.map((e) => e.order)) + 1
-        : 0)
+      (existing.length > 0 ? Math.max(...existing.map((e) => e.order)) + 1 : 0)
 
     const media = InvestigationMediaFactory.createFromJournalistProof(
       0,
@@ -498,7 +510,7 @@ export class FactCheckingService {
     const audit = directorAcceptUnverifiableArchiveWithAudit(
       director,
       investigation,
-      comment,  
+      comment,
     )
 
     await this.investigationRepository.update(investigation)

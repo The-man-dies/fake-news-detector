@@ -1,7 +1,11 @@
 // domain/processes/investigationMediaCopy.ts
 // Build InvestigationMedia rows (id placeholders) copied from report or director inbox.
 
-import type { ReportMedia, InboxSubjectMedia, InvestigationMedia } from '../value-objects/Media'
+import type {
+  ReportMedia,
+  InboxSubjectMedia,
+  InvestigationMedia,
+} from '../value-objects/Media'
 import { InvestigationMediaFactory } from '../factories/MediaFactory'
 
 export type InvestigationMediaCopySource =

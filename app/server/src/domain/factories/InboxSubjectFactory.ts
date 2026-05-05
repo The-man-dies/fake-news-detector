@@ -2,7 +2,7 @@ import {
   InboxSubject,
   type InboxSubjectOrigin,
   type InboxSubjectStatus,
-} from "../entities/InboxSubject"
+} from '../entities/InboxSubject'
 import { randomUUID } from 'crypto'
 
 type CreateInboxSubjectParams = {
@@ -42,7 +42,11 @@ export class InboxSubjectFactory {
     )
   }
 
-  static createFromDirector(directorId: string, theme: string, description: string): InboxSubject {
+  static createFromDirector(
+    directorId: string,
+    theme: string,
+    description: string,
+  ): InboxSubject {
     return this.create({
       theme,
       description,

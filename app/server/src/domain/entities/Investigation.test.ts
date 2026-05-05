@@ -58,6 +58,8 @@ describe('Investigation director review invariants', () => {
       0,
       'IN_PROGRESS',
     )
-    expect(() => inv.requestRevision('NEEDS_REVISION')).toThrow(BusinessRuleError)
+    expect(() => inv.requestRevision('NEEDS_REVISION')).toThrow(
+      BusinessRuleError,
+    )
   })
 })

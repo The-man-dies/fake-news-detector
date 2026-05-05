@@ -1,5 +1,9 @@
 // domain/factories/InvestigationFactory.ts
-import { Investigation, MediaCategory, Verdict } from '../entities/Investigation'
+import {
+  Investigation,
+  MediaCategory,
+  Verdict,
+} from '../entities/Investigation'
 import { randomUUID } from 'crypto'
 
 export interface CreateInvestigationParams {

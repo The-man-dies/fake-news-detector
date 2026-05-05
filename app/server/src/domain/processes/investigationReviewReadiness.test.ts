@@ -61,9 +61,9 @@ describe('investigationReviewReadiness', () => {
       'TRUE',
       '   ',
     )
-    expect(() =>
-      assertInvestigationReadyForDirectorReview(inv, [m]),
-    ).toThrow(BusinessRuleError)
+    expect(() => assertInvestigationReadyForDirectorReview(inv, [m])).toThrow(
+      BusinessRuleError,
+    )
   })
 
   test('assertWatcherEvidence requires journalist-filled media fields', () => {
@@ -79,7 +79,9 @@ describe('investigationReviewReadiness', () => {
   test('assertWatcherEvidence throws when evidence has no media', () => {
     const ev = new Evidence('e1', 'c', 't', 'i1', 'w1', [])
     expect(() =>
-      assertWatcherEvidenceMediaCompleteForReview([{ evidence: ev, media: [] }]),
+      assertWatcherEvidenceMediaCompleteForReview([
+        { evidence: ev, media: [] },
+      ]),
     ).toThrow(BusinessRuleError)
   })
 })

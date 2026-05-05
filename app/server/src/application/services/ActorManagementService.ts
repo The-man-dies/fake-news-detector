@@ -7,9 +7,7 @@ import {
   type IJournalistRepository,
 } from '../../domain/repositories'
 import { JournalistFactory } from '../../domain/factories/JournalistFactory'
-import {
-  Director,
-} from '../../domain/entities/Director'
+import { Director } from '../../domain/entities/Director'
 import {
   Journalist,
   JournalistStatusReason,
@@ -38,9 +36,7 @@ export class ActorManagementService {
 
     const existing = await this.journalistRepository.findByEmail(email)
     if (existing) {
-      throw new BusinessRuleError(
-        'A journalist with this email already exists',
-      )
+      throw new BusinessRuleError('A journalist with this email already exists')
     }
 
     const journalist = JournalistFactory.createFromRegistration(name, email)

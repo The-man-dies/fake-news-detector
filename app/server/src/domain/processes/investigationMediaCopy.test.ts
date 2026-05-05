@@ -20,7 +20,15 @@ describe('copySourceMediaToInvestigationMedia', () => {
 
   test('copies director inbox media as DIRECTOR_INITIATED', () => {
     const rows = [
-      new InboxSubjectMedia(1, 'x', 'TEXT', 0, 'sub', 'd1', 'DIRECTOR_INITIATED'),
+      new InboxSubjectMedia(
+        1,
+        'x',
+        'TEXT',
+        0,
+        'sub',
+        'd1',
+        'DIRECTOR_INITIATED',
+      ),
     ]
     const out = copySourceMediaToInvestigationMedia('inv1', {
       type: 'INBOX_DIRECTOR',

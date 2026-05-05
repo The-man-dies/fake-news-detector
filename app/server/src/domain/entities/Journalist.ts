@@ -4,7 +4,10 @@
 import { Investigation, MediaCategory, Verdict } from './Investigation'
 import { InboxSubject } from './InboxSubject'
 import { BusinessRuleError, DomainError } from '../../shared/errors'
-import { MAX_CORRECTION_ATTEMPTS, MAX_INVESTIGATIONS_PER_JOURNALIST_AT_A_TIME } from '../../shared'
+import {
+  MAX_CORRECTION_ATTEMPTS,
+  MAX_INVESTIGATIONS_PER_JOURNALIST_AT_A_TIME,
+} from '../../shared'
 import { StatusReason, ActorStatus, ActorRole } from '../../shared/types'
 
 export type JournalistRole = ActorRole
@@ -124,7 +127,8 @@ export class Journalist {
     if (
       investigation.journalistId === this.id &&
       this.activeInvestigationsCount > 0 &&
-      (investigation.status === 'PUBLISHED' || investigation.status === 'ARCHIVED')
+      (investigation.status === 'PUBLISHED' ||
+        investigation.status === 'ARCHIVED')
     ) {
       this.activeInvestigationsCount--
       this.incrementEngagementScore(2)

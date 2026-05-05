@@ -330,7 +330,9 @@ export class QueryService {
     }
   }
 
-  private toPublicationSummary(publication: Publication): PublicationSummaryDto {
+  private toPublicationSummary(
+    publication: Publication,
+  ): PublicationSummaryDto {
     return {
       id: publication.id,
       investigationId: publication.investigationId,

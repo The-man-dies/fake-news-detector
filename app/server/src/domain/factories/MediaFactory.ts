@@ -1,4 +1,10 @@
-import { InvestigationMedia, VerifiedLink, InboxSubjectMedia, EvidenceMedia, VerifiedMedia } from '../value-objects/Media'
+import {
+  InvestigationMedia,
+  VerifiedLink,
+  InboxSubjectMedia,
+  EvidenceMedia,
+  VerifiedMedia,
+} from '../value-objects/Media'
 
 import type {
   MediaType,
@@ -189,7 +195,6 @@ export class InvestigationMediaFactory {
   }
 }
 
-
 // Evidence Media
 
 export interface CreateEvidenceMediaParams {
@@ -284,7 +289,7 @@ export class VerifiedMediaFactory {
       params.uploadedById,
       params.authoritySourceId,
       new Date(),
-      new Date()
+      new Date(),
     )
   }
 
@@ -304,7 +309,7 @@ export class VerifiedMediaFactory {
       url,
       type,
       uploadedById,
-      authoritySourceId
+      authoritySourceId,
     })
   }
 
@@ -341,7 +346,7 @@ export class VerifiedLinkFactory {
       params.uploadedById,
       params.authoritySourceId,
       new Date(),
-      new Date()
+      new Date(),
     )
   }
 
@@ -357,7 +362,7 @@ export class VerifiedLinkFactory {
       publicationId,
       url,
       uploadedById,
-      authoritySourceId
+      authoritySourceId,
     })
   }
 

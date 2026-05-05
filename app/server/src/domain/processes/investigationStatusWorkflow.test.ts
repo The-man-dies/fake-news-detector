@@ -11,7 +11,13 @@ import {
 
 describe('investigationStatusWorkflow', () => {
   const director = new Director('d1', 'Dir', 'd@test', 'ACTIVE')
-  const journalist = new Journalist('j1', 'Jour', 'j@test', 'JOURNALIST', 'ACTIVE')
+  const journalist = new Journalist(
+    'j1',
+    'Jour',
+    'j@test',
+    'JOURNALIST',
+    'ACTIVE',
+  )
 
   test('submitInvestigationForReviewWithAudit records transition to PENDING_REVIEW', () => {
     const inv = new Investigation(
@@ -59,7 +65,11 @@ describe('investigationStatusWorkflow', () => {
       0,
       'PENDING_REVIEW',
     )
-    const audit = directorRejectInvestigationWithAudit(director, inv, 'Sources insuffisantes')
+    const audit = directorRejectInvestigationWithAudit(
+      director,
+      inv,
+      'Sources insuffisantes',
+    )
     expect(inv.status).toBe('NEEDS_REVISION')
     expect(audit.isRejection()).toBe(true)
     expect(audit.comment).toBe('Sources insuffisantes')
@@ -77,7 +87,11 @@ describe('investigationStatusWorkflow', () => {
       0,
       'PENDING_REVIEW',
     )
-    const audit = directorAcceptUnverifiableArchiveWithAudit(director, inv, null)
+    const audit = directorAcceptUnverifiableArchiveWithAudit(
+      director,
+      inv,
+      null,
+    )
     expect(inv.status).toBe('ARCHIVED')
     expect(audit.isArchived()).toBe(true)
   })

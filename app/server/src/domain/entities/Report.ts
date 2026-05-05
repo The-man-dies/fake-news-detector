@@ -28,7 +28,11 @@ export class Report {
     this.updatedAt = new Date()
   }
 
-  updateContent(title: string | null, content: string | null, theme: string): void {
+  updateContent(
+    title: string | null,
+    content: string | null,
+    theme: string,
+  ): void {
     this.title = title
     this.content = content
     this.theme = theme

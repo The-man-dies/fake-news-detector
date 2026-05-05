@@ -12,6 +12,9 @@ export interface InboxSubjectMediaInsert {
 }
 
 export interface IInboxSubjectMediaRepository {
-  saveMany(inboxSubjectId: string, items: InboxSubjectMediaInsert[]): Promise<void>
+  saveMany(
+    inboxSubjectId: string,
+    items: InboxSubjectMediaInsert[],
+  ): Promise<void>
   findByInboxSubjectId(inboxSubjectId: string): Promise<InboxSubjectMedia[]>
 }

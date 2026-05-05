@@ -2,8 +2,21 @@
 
 import { BusinessRuleError } from '../../shared'
 
-export type MediaType = 'AUDIO' | 'LINK' | 'TEXT' | 'IMAGE' | 'VIDEO' | 'DOCUMENT'
-export type MediaCategory = 'CONTEXT_COLLAPSE' | 'MANIPULATED' | 'FABRICATED' | 'SATIRE' | 'MISLEADING' | 'IMPOSTOR' | 'OTHER'
+export type MediaType =
+  | 'AUDIO'
+  | 'LINK'
+  | 'TEXT'
+  | 'IMAGE'
+  | 'VIDEO'
+  | 'DOCUMENT'
+export type MediaCategory =
+  | 'CONTEXT_COLLAPSE'
+  | 'MANIPULATED'
+  | 'FABRICATED'
+  | 'SATIRE'
+  | 'MISLEADING'
+  | 'IMPOSTOR'
+  | 'OTHER'
 export type MediaOrigin =
   | 'CITIZEN_REPORT'
   | 'JOURNALIST_PROOF'
@@ -127,7 +140,9 @@ export class InvestigationMedia {
     authoritySourceId?: string,
   ): InvestigationMedia {
     if (investigationMediaId !== this.id) {
-      throw new BusinessRuleError("Cannot update investigation media: id doesn't match")
+      throw new BusinessRuleError(
+        "Cannot update investigation media: id doesn't match",
+      )
     }
     if (investigationId !== this.investigationId) {
       throw new BusinessRuleError(

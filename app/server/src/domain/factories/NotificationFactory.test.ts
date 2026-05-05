@@ -21,7 +21,11 @@ describe('NotificationFactory', () => {
 
   test('createBatch throws DomainError when publicationId is blank', () => {
     expect(() =>
-      NotificationFactory.createBatch(['actor-1'], 'Nouveau verdict publie', '   '),
+      NotificationFactory.createBatch(
+        ['actor-1'],
+        'Nouveau verdict publie',
+        '   ',
+      ),
     ).toThrow(DomainError)
   })
 
@@ -36,5 +40,4 @@ describe('NotificationFactory', () => {
     expect(n.type).toBe('ARCHIVED_PUBLICATION')
     expect(n.actorId).toBe('a1')
   })
-
 })
