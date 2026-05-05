@@ -28,14 +28,16 @@ In an era of information overload, distinguishing fact from fiction is critical.
 
 ### Structured Fact-Checking Workflow
 ```
-Report → Investigation → Review → Publication
+Report ──▶ InboxSubject ──▶ Investigation ──▶ Review ──▶ Publication
+              (mandatory)        (origin-tagged media)
 ```
 
-1. **Submission** - Citizens submit suspicious content with media
-2. **Assignment** - Journalists pick available reports and start investigations
-3. **Evidence Collection** - Watchers contribute supporting evidence
-4. **Validation** - Directors review and approve investigations
-5. **Publication** - Verified analysis is published with final verdict
+1. **Submission** - Citizens submit suspicious content with media (Report status: OPEN)
+2. **Inbox Creation** - All reports become InboxSubjects (origin: REPORT or DIRECTOR_INITIATED)
+3. **Assignment** - Journalists pick InboxSubjects and start investigations
+4. **Evidence Collection** - Watchers contribute supporting evidence
+5. **Validation** - Directors review and approve investigations
+6. **Publication** - Verified analysis is published with final verdict
 
 ### Quality Control Mechanisms
 - **Citizen Report Limit** - Maximum 3 open reports per citizen (`MAX_REPORTING_PER_CITIZEN_AT_A_TIME = 3`)
@@ -79,7 +81,7 @@ src/
 | `Citizen` | Report submission, watcher application, evidence submission (if WATCHER) | Max 3 open reports; Only WATCHER can submit evidence |
 | `Journalist` | Investigation management, draft creation, submission for review | Max 1 active investigation at a time |
 | `Director` | Validation, user management, inbox subject creation, watcher approval | Cannot validate own work; Editorial oversight |
-| `Report` | User-submitted suspicious content with theme, title, content | Can only be picked if status is OPEN |
+| `Report` | User-submitted suspicious content with theme, title, content | Simple lifecycle: OPEN → ARCHIVED only |
 | `Investigation` | Journalist's fact-checking process with verdict and media category | Max revision attempts; Requires media category before submission |
 | `Evidence` | Supporting documents submitted by Watchers | Linked to investigation; Submitter must be WATCHER |
 | `Publication` | Final approved analysis with verdict | Can be marked as correction |
@@ -101,12 +103,17 @@ OPEN → IN_PROGRESS → PENDING_REVIEW → [PUBLISHED | ARCHIVED | NEEDS_REVISI
 - **PUBLISHED** - Director approved; investigation is public
 - **ARCHIVED** - Investigation with UNVERIFIABLE verdict (cannot be verified)
 
+**Source of Truth Principle:**
+- **Report**: Tracks citizen submission only (`OPEN → ARCHIVED`)
+- **InboxSubject**: Tracks investigation progress (`OPEN → IN_PROGRESS → ARCHIVED`)
+- **Investigation**: Tracks fact-checking workflow
+
 **Transitions:**
-- Journalist: `OPEN` → `IN_PROGRESS` → `PENDING_REVIEW`
+- Journalist: `OPEN` → `PENDING_REVIEW` (via `submitForReview()`)
 - Director: `PENDING_REVIEW` → `PUBLISHED` (if verdict is TRUE/FALSE/MISLEADING)
 - Director: `PENDING_REVIEW` → `ARCHIVED` (if verdict is UNVERIFIABLE)
 - Director: `PENDING_REVIEW` → `NEEDS_REVISION` (rejection with feedback)
-- Journalist: `NEEDS_REVISION` → `IN_PROGRESS` (correction cycle)
+- Journalist: `NEEDS_REVISION` → `OPEN` (correction cycle)
 
 ### Domain Values
 
