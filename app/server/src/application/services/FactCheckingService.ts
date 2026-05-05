@@ -36,7 +36,7 @@ import type {
   MediaCategory,
   Verdict,
 } from '../../domain/entities/Investigation'
-import type { MediaType } from '../../domain/value-objects'
+import type { MediaType, InvestigationMedia } from '../../domain/value-objects'
 import type { SourceType } from '../../domain/entities/AuthoritySource'
 import { copySourceMediaToInvestigationMedia } from '../../domain/processes/investigationMediaCopy'
 import {
@@ -138,6 +138,11 @@ export class FactCheckingService {
     }
     const citizen = await this.citizenRepository.findById(citizenId)
     if (!citizen) throw new NotFoundError('Citizen', citizenId)
+    if (!citizen.canApplyForWatcher()) {
+      throw new BusinessRuleError(
+        'Citizen cannot apply for watcher: must be ACTIVE and REGULAR type',
+      )
+    }
     if (citizen.isWatcher()) {
       throw new BusinessRuleError('Citizen is already a watcher')
     }
@@ -238,39 +243,37 @@ export class FactCheckingService {
 
     const investigation = journalist.pickInboxSubject(subject)
 
-    await this.inboxSubjectRepository.update(subject)
-    await this.journalistRepository.update(journalist)
-    await this.investigationRepository.save(investigation)
-
+    // Préparer les médias avant toute persistence pour éviter l'état partiel
+    let mediaCopies: InvestigationMedia[] = []
     if (subject.origin === 'REPORT' && subject.reportId) {
       const reportRows = await this.reportMediaRepository.findByReportId(
         subject.reportId,
       )
-      const copies = copySourceMediaToInvestigationMedia(investigation.id, {
+      mediaCopies = copySourceMediaToInvestigationMedia(investigation.id, {
         type: 'REPORT',
         rows: reportRows,
       })
-      if (copies.length > 0) {
-        await this.investigationMediaRepository.saveMany(
-          investigation.id,
-          copies,
-        )
-      }
     } else if (subject.origin === 'DIRECTOR_INITIATED') {
       const inboxRows =
         await this.inboxSubjectMediaRepository.findByInboxSubjectId(
           inboxSubjectId,
         )
-      const copies = copySourceMediaToInvestigationMedia(investigation.id, {
+      mediaCopies = copySourceMediaToInvestigationMedia(investigation.id, {
         type: 'INBOX_DIRECTOR',
         rows: inboxRows,
       })
-      if (copies.length > 0) {
-        await this.investigationMediaRepository.saveMany(
-          investigation.id,
-          copies,
-        )
-      }
+    }
+
+    // Persister tout atomiquement (TODO: wrapper dans une transaction)
+    await this.inboxSubjectRepository.update(subject)
+    await this.journalistRepository.update(journalist)
+    await this.investigationRepository.save(investigation)
+
+    if (mediaCopies.length > 0) {
+      await this.investigationMediaRepository.saveMany(
+        investigation.id,
+        mediaCopies,
+      )
     }
 
     return investigation
