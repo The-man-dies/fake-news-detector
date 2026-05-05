@@ -4,8 +4,10 @@
 import { Director } from '../entities/Director'
 import { Journalist } from '../entities/Journalist'
 import { Investigation } from '../entities/Investigation'
+import { InvestigationMedia } from '../value-objects'
 import { WorkflowAudit } from '../entities/WorkflowAudit'
 import { WorkflowAuditFactory } from '../factories/WorkflowAuditFactory'
+
 import {
   assertInvestigationReadyForDirectorReview,
   assertWatcherEvidenceMediaCompleteForReview,
