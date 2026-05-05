@@ -9,13 +9,13 @@ export class Publication {
     public approvedById: string,
     public finalVerdict: Verdict,
     public publishedAt: Date = new Date(),
-    public receivedACorrection: boolean = false,
+    public isCorrection: boolean = false,
     public readonly createdAt: Date = new Date(),
     public updatedAt: Date = new Date(),
   ) {}
 
   markAsCorrection(): void {
-    this.receivedACorrection = true
+    this.isCorrection = true
     this.updatedAt = new Date()
   }
 
